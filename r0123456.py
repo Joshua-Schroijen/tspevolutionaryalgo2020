@@ -1,21 +1,26 @@
-import Reporter
 import numpy as np
+import math
+
+import Reporter
 
 class r0123456:
-    def __init__(self, k = 5, no_individuals_to_keep):
+    def __init__(self, population_size_factor = 5, k = 5, no_individuals_to_keep = 100):
         self.reporter = Reporter.Reporter(self.__class__.__name__)
 
+        self._population_size_factor = population_size_factor
         self._k = k
         self._no_individuals_to_keep = no_individuals_to_keep
         
         self._tsp = None
-
+        self._population_size = math.nan
+        
     def optimize(self, filename):		
         file = open(filename)
         distanceMatrix = np.loadtxt(file, delimiter=",")
         file.close()
         
         self._tsp = TSP(distanceMatrix)
+        self._population_size = self._population_size_factor * self._tsp.no_vertices
 
         # Your code here.
 
@@ -36,7 +41,24 @@ class r0123456:
         return 0
 
     def _initialize(self):
-        self._population = Population.initialize(self.knapsack_problem, self.population_size)
+        starting_individuals = []
+        
+        for vertex in range(self._tsp.no_vertices):
+            starting_individuals.append(self.__get_nearest_neighbour_solution(vertex))
+        
+        for _ in range(self._population_size_factor - 1):
+            for vertex in range(self._tsp.no_vertices):
+                permutation = starting_individuals[vertex]
+                no_random_swaps = max(1, min(np.random.poisson(math.floor(self._population_size / 4)), self._population_size))
+                
+                for _ in range(no_random_swaps):
+                    a = np.random.randint(0, self._tsp.no_vertices)
+                    b = np.random.randint(0, self._tsp.no_vertices)
+                    permutation = self.__get_swapped(permutation, a, b)
+                
+                starting_individuals.append(permutation)
+            
+        self._population = Population(starting_individuals)
 
     def _selection(self):
         selected = list(np.random.choice(self._population.individuals, self._k))
@@ -48,7 +70,12 @@ class r0123456:
         pass
         
     def _mutation(self, individual):
-        pass
+        if np.random.rand() <= individual.mutation_chance:
+            a = np.random.randint(0, self._tsp.no_vertices)
+            b = np.random.randint(0, self._tsp.no_vertices)
+            return Individual(self.__get_swapped(individual.permutation, a, b), individual.mutation_chance)
+        else:
+            return individual
             
     def _elimination(self, offspring):
         combined = []
@@ -58,6 +85,31 @@ class r0123456:
         
         selected = np.flip(np.argsort(np.array(list(map(lambda individual: self._tsp.fitness(individual), combined)))))[0:self._no_individuals_to_keep]
         return list(combined[selected])
+
+    def __get_nearest_neighbour_solution(starting_vertex):
+        nn_solution = np.empty(self._tsp.no_vertices)
+        i = 0
+
+        current_vertex = starting_vertex
+        nn_solution[i] = current_vertex
+        edge_weights = np.copy(self._tsp.distance_matrix[:, current_vertex])
+        edge_weights[current_vertex] = np.Inf
+        next_vertex = np.argmin(edge_weights)
+        i += 1
+        while next_vertex != starting_vertex:
+            current_vertex = next_vertex
+            nn_solution[i] = curent_vertex
+            edge_weights = np.copy(self._tsp.distance_matrix[:, current_vertex])
+            edge_weights[current_vertex] = np.Inf
+            next_vertex = np.argmin(edge_weights)
+            i += 1
+
+        return nn_solution
+        
+    def __get_swapped(permutation, a, b):
+        permutation_copy = np.copy(permutation)
+        permutation_copy[[b, a]] = permutation_copy[[a, b]]
+        return permutation_copy
 
 class TSP:
     def __init__(self, distance_matrix):
@@ -85,17 +137,6 @@ class TSP:
         return self._distance_matrix.shape[0]
 
 class Individual:
-    @staticmethod
-    def get_random_instance(info, mutation_chance = 0.05):
-        if   isinstance(info, int):
-            return Individual(np.random.permutation(np.arange(info)), mutation_chance)
-        else:
-            return Individual(np.random.permutation(np.arange(info.no_vertices)), mutation_chance)
-
-    @staticmethod
-    def get_random_instances(no_instances, info, mutation_chance = 0.05):
-        return [Individual.get_random_instance(info, mutation_chance) for _ in range(no_instances)]
-
     def __init__(self, permutation, mutation_chance = 0.05):
         self._permutation = order
         self._mutation_chance = mutation_chance
@@ -117,10 +158,6 @@ class Individual:
         self._mutation_chance = mutation_chance
         
 class Population:
-    @staticmethod
-    def initialize(no_individuals, tsp, mutation_chance = 0.05):
-        return Population(Individual.get_random_instances(no_individuals, tsp, mutation_chance))
-
     def __init__(self, individuals):
         self._individuals = individuals
 
