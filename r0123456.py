@@ -94,7 +94,41 @@ class r0123456:
         return selected[i]
 
     def _recombination(self, first_parent, second_parent):
-        pass
+        child_permutation = []
+        
+        current_vertex = np.random.randint(self._tsp.no_vertices)
+        child_permutation.append(current_vertex)
+        for _ in range(self._tsp.no_vertices - 1):
+            first_parent_current_vertex_idx = first_parent.permutation.index(current_vertex)
+            second_parent_current_vertex_idx = second_parent.permutation.index(current_vertex)
+            first_parent_edge_endpoint = first_parent.permutation[first_parent_current_vertex_idx + 1] if first_parent_current_vertex_idx < (self._tsp.no_vertices - 1) else first_parent.permutation[0]
+            second_parent_edge_endpoint = second_parent.permutation[second_parent_current_vertex_idx + 1] if second_parent_current_vertex_idx < (self._tsp.no_vertices - 1) else second_parent.permutation[0]
+            first_parent_edge_length = self._tsp.distance_matrix[first_parent_edge_endpoint, current_vertex]
+            second_parent_edge_length = self._tsp.distance_matrix[second_parent_edge_endpoint, current_vertex]
+            
+            if (first_parent_edge_endpoint in child_permutation) and (second_parent_edge_endpoint in child_permutation):
+                possible_endpoints = [edge_endpoint for edge_endpoint in range(self._tsp.no_vertices) if edge_endpoint not in child_permutation and edge_endpoint != current_vertex]
+                possible_edge_lenghts = [self._tsp.distance_matrix[possible_endpoint, current_vertex] for possible_endpoint in possible_endpoints]
+                chosen_endpoint = possible_endpoints[np.argmin(possible_edge_lenghts)]
+                child_permutation.append(chosen_endpoint)
+                current_vertex = chosen_endpoint
+            elif (first_parent_edge_endpoint not in child_permutation) and (second_parent_edge_endpoint in child_permutation):
+                child_permutation.append(first_parent_edge_endpoint)
+                current_vertex = first_parent_edge_endpoint
+            elif (first_parent_edge_endpoint in child_permutation) and (second_parent_edge_endpoint not in child_permutation):
+                child_permutation.append(second_parent_edge_endpoint)
+                current_vertex = second_parent_edge_endpoint
+            else:
+                if first_parent_edge_length <= second_parent_edge_length:
+                    child_permutation.append(first_parent_edge_endpoint)
+                    current_vertex = first_parent_edge_endpoint
+                else:
+                    child_permutation.append(second_parent_edge_endpoint)
+                    current_vertex = second_parent_edge_endpoint
+                    
+        child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
+
+        return Individual(np.array(child_permutation), child_mutation_chance)
         
     def _mutation(self, individual):
         if np.random.rand() <= individual.mutation_chance:
