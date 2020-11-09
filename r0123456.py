@@ -26,8 +26,8 @@ class r0123456:
         self._population_size = self._population_size_factor * self._tsp.no_vertices
         self._initialize_population()
 
-        current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
-        current_best_fitness = self._tsp.best_fitness(self._population.individuals)
+        current_mean_fitness = TSP.mean_fitness(self._population.individuals)
+        current_best_fitness = TSP.best_fitness(self._population.individuals)
         current_change = math.nan
         change_ratio = float('inf')
         while( change_ratio > self._stopping_ratio ):
@@ -45,11 +45,9 @@ class r0123456:
 
             self._population = Population(self._elimination(offspring))
 
-            current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
-            current_best_fitness = self._tsp.best_fitness(self._population.individuals)
-            
-            # TODO - create cycle representation for Representer class?
-            
+            current_mean_fitness = TSP.mean_fitness(self._population.individuals)
+            current_best_fitness = TSP.best_fitness(self._population.individuals)
+
             previous_change = current_change
             current_change = previous_mean_fitness - current_mean_fitness
             if math.isnan(previous_change):
@@ -62,7 +60,7 @@ class r0123456:
             #  - the best objective function value of the population
             #  - a 1D numpy array in the cycle notation containing the best solution 
             #    with city numbering starting from 0
-            timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, bestSolution)
+            timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, TSP.best_individual(self._population.individuals).permutation)
             if timeLeft < 0:
                 break
 
@@ -141,6 +139,18 @@ class r0123456:
         return permutation_copy
 
 class TSP:
+    @staticmethod
+    def mean_fitness(self, individuals):
+        return statistics.mean([self.fitness(individual) for individual in individuals])
+    
+    @staticmethod
+    def best_fitness(self, individuals):
+        return max([self.fitness(individual) for individual in individuals])
+
+    @staticmethod
+    def best_individual(self, individuals):
+        return individuals[np.argmax([self.fitness(individual) for individual in individuals])]
+
     def __init__(self, distance_matrix):
         self._distance_matrix = distance_matrix
 
@@ -152,13 +162,7 @@ class TSP:
         total_distance += self._distance_matrix[b, individual.permutation[0]]
 
         return total_distance
-
-    def mean_fitness(self, individuals):
-        return statistics.mean([self.fitness(individual) for individual in individuals])
-    
-    def best_fitness(self, individuals):
-        return max([self.fitness(individual) for individual in individuals])
-
+   
     @property
     def distance_matrix(self):
         return self._distance_matrix
