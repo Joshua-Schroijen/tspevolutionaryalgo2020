@@ -29,13 +29,38 @@ class r0123456:
 		# Your code here.
 		return 0
 
+class TSP:
+    def __init__(self, distance_matrix):
+        self._distance_matrix = distance_matrix
+
+    def fitness(self, individual):
+        total_distance = 0
+        for a, b in zip(individual.permutation[0:(self.no_vertices - 1)], individual.permutation[1:self.no_vertices]):
+          total_distance += self._distance_matrix[a, b]
+
+        total_distance += self._distance_matrix[b, individual.permutation[0])
+
+        return total_distance
+
+    @property
+    def distance_matrix(self):
+        return self._distance_matrix
+
+    @distance_matrix.setter
+    def distance_matrix(self, distance_matrix):
+        self._distance_matrix = distance_matrix
+
+    @property
+    def no_vertices(self):
+        return self._distance_matrix.shape[0]
+
 class Individual:
     @staticmethod
     def get_random_instance(info, mutation_chance = 0.05):
         if   isinstance(info, int):
-            return Individual(np.random.permutation(np.arange(1, info + 1)), mutation_chance)
+            return Individual(np.random.permutation(np.arange(info)), mutation_chance)
         else:
-            return Individual(np.random.permutation(np.arange(1, info.no_vertices + 1)), mutation_chance)
+            return Individual(np.random.permutation(np.arange(info.no_vertices)), mutation_chance)
 
     @staticmethod
     def get_random_instances(no_instances, info, mutation_chance = 0.05):
@@ -63,8 +88,8 @@ class Individual:
         
 class Population:
     @staticmethod
-    def initialize(tsp_problem, no_individuals, mutation_chance = 0.05):
-        return Population(Individual.get_random_instances(no_individuals, tsp_problem, mutation_chance))
+    def initialize(no_individuals, tsp, mutation_chance = 0.05):
+        return Population(Individual.get_random_instances(no_individuals, tsp, mutation_chance))
 
     def __init__(self, individuals):
         self._individuals = individuals
