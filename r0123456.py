@@ -4,11 +4,12 @@ import numpy as np
 import Reporter
 
 class r0123456:
-    def __init__(self, population_size_factor = 5, k = 5, no_individuals_to_keep = 100, stopping_ratio = 0.01):
+    def __init__(self, population_size_factor = 5, k = 5, mu = 100, no_individuals_to_keep = 100, stopping_ratio = 0.01):
         self.reporter = Reporter.Reporter(self.__class__.__name__)
 
         self._population_size_factor = population_size_factor
         self._k = k
+        self._mu = mu
         self._no_individuals_to_keep = no_individuals_to_keep
         self._stopping_ratio = stopping_ratio
 
@@ -33,7 +34,16 @@ class r0123456:
             previous_mean_fitness = current_mean_fitness
             previous_best_fitness = current_best_fitness
 
-            # TODO - main loop
+            offspring = []
+            for _ in range(self._mu):
+                first_parent = self._selection()
+                second_parent = self._selection()
+                offspring.append(self._mutation(self._recombination(first_parent, second_parent)))
+
+            for idx, individual in enumerate(self._population):
+                self._population.individuals[idx] = self._mutation(individual)
+
+            self._population = Population(self._elimination(offspring))
 
             current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
             current_best_fitness = self._tsp.best_fitness(self._population.individuals)
