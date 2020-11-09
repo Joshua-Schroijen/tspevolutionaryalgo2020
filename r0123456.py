@@ -2,16 +2,20 @@ import Reporter
 import numpy as np
 
 class r0123456:
-    def __init__(self, k = 5):
+    def __init__(self, k = 5, no_individuals_to_keep):
         self.reporter = Reporter.Reporter(self.__class__.__name__)
 
-        self.k = k
+        self._k = k
+        self._no_individuals_to_keep = no_individuals_to_keep
+        
+        self._tsp = None
 
-    def optimize(self, filename):
-        # Read distance matrix from file.		
+    def optimize(self, filename):		
         file = open(filename)
         distanceMatrix = np.loadtxt(file, delimiter=",")
         file.close()
+        
+        self._tsp = TSP(distanceMatrix)
 
         # Your code here.
 
@@ -35,7 +39,7 @@ class r0123456:
         self._population = Population.initialize(self.knapsack_problem, self.population_size)
 
     def _selection(self):
-        selected = list(np.random.choice(self._population.individuals, k))
+        selected = list(np.random.choice(self._population.individuals, self._k))
         fitnesses = [self._tsp.fitness(individual) for individual in selected]
         i = fitnesses.index(max(fitnesses))
         return selected[i]
@@ -47,7 +51,13 @@ class r0123456:
         pass
             
     def _elimination(self, offspring):
-        pass
+        combined = []
+        combined.extend(self._population.individuals)
+        combined.extend(offspring)
+        combined = np.array(combined)
+        
+        selected = np.flip(np.argsort(np.array(list(map(lambda individual: self._tsp.fitness(individual), combined)))))[0:self._no_individuals_to_keep]
+        return list(combined[selected])
 
 class TSP:
     def __init__(self, distance_matrix):
