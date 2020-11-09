@@ -2,32 +2,52 @@ import Reporter
 import numpy as np
 
 class r0123456:
-	def __init__(self):
-		self.reporter = Reporter.Reporter(self.__class__.__name__)
+    def __init__(self, k = 5):
+        self.reporter = Reporter.Reporter(self.__class__.__name__)
 
-	def optimize(self, filename):
-		# Read distance matrix from file.		
-		file = open(filename)
-		distanceMatrix = np.loadtxt(file, delimiter=",")
-		file.close()
+        self.k = k
 
-		# Your code here.
+    def optimize(self, filename):
+        # Read distance matrix from file.		
+        file = open(filename)
+        distanceMatrix = np.loadtxt(file, delimiter=",")
+        file.close()
 
-		while( yourConvergenceTestsHere ):
+        # Your code here.
 
-			# Your code here.
+        while( yourConvergenceTestsHere ):
 
-			# Call the reporter with:
-			#  - the mean objective function value of the population
-			#  - the best objective function value of the population
-			#  - a 1D numpy array in the cycle notation containing the best solution 
-			#    with city numbering starting from 0
-			timeLeft = self.reporter.report(meanObjective, bestObjective, bestSolution)
-			if timeLeft < 0:
-				break
+            # Your code here.
 
-		# Your code here.
-		return 0
+            # Call the reporter with:
+            #  - the mean objective function value of the population
+            #  - the best objective function value of the population
+            #  - a 1D numpy array in the cycle notation containing the best solution 
+            #    with city numbering starting from 0
+            timeLeft = self.reporter.report(meanObjective, bestObjective, bestSolution)
+            if timeLeft < 0:
+                break
+
+        # Your code here.
+        return 0
+
+    def _initialize(self):
+        self._population = Population.initialize(self.knapsack_problem, self.population_size)
+
+    def _selection(self):
+        selected = list(np.random.choice(self._population.individuals, k))
+        fitnesses = [self._tsp.fitness(individual) for individual in selected]
+        i = fitnesses.index(max(fitnesses))
+        return selected[i]
+
+    def _recombination(self, first_parent, second_parent):
+        pass
+        
+    def _mutation(self, individual):
+        pass
+            
+    def _elimination(self, offspring):
+        pass
 
 class TSP:
     def __init__(self, distance_matrix):
@@ -36,9 +56,9 @@ class TSP:
     def fitness(self, individual):
         total_distance = 0
         for a, b in zip(individual.permutation[0:(self.no_vertices - 1)], individual.permutation[1:self.no_vertices]):
-          total_distance += self._distance_matrix[a, b]
+            total_distance += self._distance_matrix[a, b]
 
-        total_distance += self._distance_matrix[b, individual.permutation[0])
+        total_distance += self._distance_matrix[b, individual.permutation[0]]
 
         return total_distance
 
