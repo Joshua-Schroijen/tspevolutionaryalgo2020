@@ -29,3 +29,35 @@ class r0123456:
 
 		# Your code here.
 		return 0
+
+class Individual:
+    @staticmethod
+    def get_random_instance(info, mutation_chance = 0.05):
+        if   isinstance(info, int):
+            return Individual(np.random.permutation(np.arange(1, info + 1)), mutation_chance)
+        else:
+            return Individual(np.random.permutation(np.arange(1, info.no_vertices + 1)), mutation_chance)
+
+    @staticmethod
+    def get_random_instances(no_instances, info, mutation_chance = 0.05):
+        return [Individual.get_random_instance(info, mutation_chance) for _ in range(no_instances)]
+
+    def __init__(self, permutation, mutation_chance = 0.05):
+        self._permutation = order
+        self._mutation_chance = mutation_chance
+
+    @property
+    def permutation(self):
+        return self._permutation
+
+    @order.setter
+    def permutation(self, permutation):
+        self._permutation = permutation
+
+    @property
+    def mutation_chance(self):
+        return self._mutation_chance
+
+    @mutation_chance.setter
+    def mutation_chance(self, mutation_chance):
+        self._mutation_chance = mutation_chance
