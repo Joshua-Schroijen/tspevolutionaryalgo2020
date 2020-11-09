@@ -1,16 +1,18 @@
-import numpy as np
 import math
-
+import statistics
+import numpy as np
 import Reporter
 
 class r0123456:
-    def __init__(self, population_size_factor = 5, k = 5, no_individuals_to_keep = 100):
+    def __init__(self, population_size_factor = 5, k = 5, no_individuals_to_keep = 100, stopping_ratio = 0.01):
         self.reporter = Reporter.Reporter(self.__class__.__name__)
 
         self._population_size_factor = population_size_factor
         self._k = k
         self._no_individuals_to_keep = no_individuals_to_keep
-        
+        self._stopping_ratio = stopping_ratio
+
+        self._population = None
         self._tsp = None
         self._population_size = math.nan
         
@@ -21,26 +23,43 @@ class r0123456:
         
         self._tsp = TSP(distanceMatrix)
         self._population_size = self._population_size_factor * self._tsp.no_vertices
+        self._initialize_population()
 
-        # Your code here.
+        current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
+        current_best_fitness = self._tsp.best_fitness(self._population.individuals)
+        current_change = math.nan
+        change_ratio = float('inf')
+        while( change_ratio > self._stopping_ratio ):
+            previous_mean_fitness = current_mean_fitness
+            previous_best_fitness = current_best_fitness
 
-        while( yourConvergenceTestsHere ):
+            # TODO - main loop
 
-            # Your code here.
+            current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
+            current_best_fitness = self._tsp.best_fitness(self._population.individuals)
+            
+            # TODO - create cycle representation for Representer class?
+            
+            previous_change = current_change
+            current_change = previous_mean_fitness - current_mean_fitness
+            if math.isnan(previous_change):
+                change_ratio = float('inf')
+            else:
+                change_ratio = math.abs(current_change / previous_change)
 
             # Call the reporter with:
             #  - the mean objective function value of the population
             #  - the best objective function value of the population
             #  - a 1D numpy array in the cycle notation containing the best solution 
             #    with city numbering starting from 0
-            timeLeft = self.reporter.report(meanObjective, bestObjective, bestSolution)
+            timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, bestSolution)
             if timeLeft < 0:
                 break
 
-        # Your code here.
+        # Your code here. (finalization & cleanup)
         return 0
 
-    def _initialize(self):
+    def _initialize_population(self):
         starting_individuals = []
         
         for vertex in range(self._tsp.no_vertices):
@@ -123,6 +142,12 @@ class TSP:
         total_distance += self._distance_matrix[b, individual.permutation[0]]
 
         return total_distance
+
+    def mean_fitness(self, individuals):
+        return statistics.mean([self.fitness(individual) for individual in individuals])
+    
+    def best_fitness(self, individuals):
+        return max([self.fitness(individual) for individual in individuals])
 
     @property
     def distance_matrix(self):
