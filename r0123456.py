@@ -2,7 +2,6 @@ import Reporter
 import numpy as np
 
 class r0123456:
-
 	def __init__(self):
 		self.reporter = Reporter.Reporter(self.__class__.__name__)
 
@@ -61,3 +60,22 @@ class Individual:
     @mutation_chance.setter
     def mutation_chance(self, mutation_chance):
         self._mutation_chance = mutation_chance
+        
+class Population:
+    @staticmethod
+    def initialize(tsp_problem, no_individuals, mutation_chance = 0.05):
+        return Population(Individual.get_random_instances(no_individuals, tsp_problem, mutation_chance))
+
+    def __init__(self, individuals):
+        self._individuals = individuals
+
+    def __iter__(self):
+        return iter(self._individuals)
+
+    @property
+    def individuals(self):
+        return self._individuals
+
+    @individuals.setter
+    def individuals(self, individuals):
+        self._individuals = individuals
