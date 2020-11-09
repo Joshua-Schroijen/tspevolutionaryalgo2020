@@ -4,6 +4,12 @@ import numpy as np
 import Reporter
 
 class r0123456:
+    @staticmethod
+    def __get_swapped(permutation, a, b):
+        permutation_copy = np.copy(permutation)
+        permutation_copy[[b, a]] = permutation_copy[[a, b]]
+        return permutation_copy
+
     def __init__(self, population_size_factor = 5, k = 5, mu = 100, no_individuals_to_keep = 100, stopping_ratio = 0.01):
         self.reporter = Reporter.Reporter(self.__class__.__name__)
 
@@ -147,7 +153,7 @@ class r0123456:
         selected = np.flip(np.argsort(np.array(list(map(lambda individual: self._tsp.fitness(individual), combined)))))[0:self._no_individuals_to_keep]
         return list(combined[selected])
 
-    def __get_nearest_neighbour_solution(starting_vertex):
+    def __get_nearest_neighbour_solution(self, starting_vertex):
         nn_solution = np.empty(self._tsp.no_vertices)
         i = 0
 
@@ -159,18 +165,13 @@ class r0123456:
         i += 1
         while next_vertex != starting_vertex:
             current_vertex = next_vertex
-            nn_solution[i] = curent_vertex
+            nn_solution[i] = current_vertex
             edge_weights = np.copy(self._tsp.distance_matrix[:, current_vertex])
             edge_weights[current_vertex] = np.Inf
             next_vertex = np.argmin(edge_weights)
             i += 1
 
         return nn_solution
-        
-    def __get_swapped(permutation, a, b):
-        permutation_copy = np.copy(permutation)
-        permutation_copy[[b, a]] = permutation_copy[[a, b]]
-        return permutation_copy
 
 class TSP:
     @staticmethod
@@ -218,7 +219,7 @@ class Individual:
     def permutation(self):
         return self._permutation
 
-    @order.setter
+    @permutation.setter
     def permutation(self, permutation):
         self._permutation = permutation
 
