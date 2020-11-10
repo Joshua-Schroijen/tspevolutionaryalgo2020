@@ -23,19 +23,26 @@ class r0123456:
         self._tsp = None
         self._population_size = math.nan
         
-    def optimize(self, filename):		
+    def optimize(self, filename):
+        print("Starting evolutionary algorithm ...")
+        
         file = open(filename)
         distanceMatrix = np.loadtxt(file, delimiter=",")
         file.close()
         
         self._tsp = TSP(distanceMatrix)
         self._population_size = self._population_size_factor * self._tsp.no_vertices
+        
+        nn_mean_fitness, nn_best_fitness = self._get_benchmarks()
+        print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness}\n\tBest heuristic fitness = {nn_best_fitness}")
+         
         self._initialize_population()
 
         current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
         current_best_fitness = self._tsp.best_fitness(self._population.individuals)
         current_change = math.nan
         change_ratio = float('inf')
+        print("Entering main loop")
         while( change_ratio > self._stopping_ratio ):
             previous_mean_fitness = current_mean_fitness
             previous_best_fitness = current_best_fitness
@@ -67,11 +74,22 @@ class r0123456:
             #  - a 1D numpy array in the cycle notation containing the best solution 
             #    with city numbering starting from 0
             timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, self._tsp.best_individual(self._population.individuals).permutation)
+            print(f"Iteration complete. Change ratio = {change_ratio}, time left = {timeLeft}")
+            print(f"\tCurrent mean fitness = {current_mean_fitness}, best mean fitness = {current_best_fitness}")
             if timeLeft < 0:
                 break
 
-        # Your code here. (finalization & cleanup)
+        print("Evolutionary algorithm finished")
+
         return 0
+
+    def _get_benchmarks(self):
+        nn_individuals = []
+
+        for vertex in range(self._tsp.no_vertices):
+            nn_individuals.append(self.__get_nearest_neighbour_solution(vertex))
+            
+        return (self._tsp.mean_fitness(nn_individuals), self._tsp.best_fitness(nn_individuals))
 
     def _initialize_population(self):
         starting_individuals = []
@@ -96,7 +114,7 @@ class r0123456:
     def _selection(self):
         selected = list(np.random.choice(self._population.individuals, self._k))
         fitnesses = [self._tsp.fitness(individual) for individual in selected]
-        i = fitnesses.index(max(fitnesses))
+        i = fitnesses.index(min(fitnesses))
         return selected[i]
 
     def _recombination(self, first_parent, second_parent):
@@ -190,10 +208,10 @@ class TSP:
         return statistics.mean([self.fitness(individual) for individual in individuals])
     
     def best_fitness(self, individuals):
-        return max([self.fitness(individual) for individual in individuals])
+        return min([self.fitness(individual) for individual in individuals])
 
     def best_individual(self, individuals):
-        return individuals[np.argmax([self.fitness(individual) for individual in individuals])]
+        return individuals[np.argmin([self.fitness(individual) for individual in individuals])]
 
     @property
     def distance_matrix(self):
