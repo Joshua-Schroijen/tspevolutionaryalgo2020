@@ -180,9 +180,9 @@ class TSP:
     def fitness(self, individual):
         total_distance = 0
         for a, b in zip(individual.permutation[0:(self.no_vertices - 1)], individual.permutation[1:self.no_vertices]):
-            total_distance += self._distance_matrix[a, b]
+            total_distance += self._distance_matrix[int(a), int(b)]
 
-        total_distance += self._distance_matrix[b, individual.permutation[0]]
+        total_distance += self._distance_matrix[int(b), int(individual.permutation[0])]
 
         return total_distance
 
