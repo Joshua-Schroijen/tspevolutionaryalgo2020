@@ -109,12 +109,12 @@ class r0123456:
             second_parent_current_vertex_idx = second_parent.permutation.index(current_vertex)
             first_parent_edge_endpoint = first_parent.permutation[first_parent_current_vertex_idx + 1] if first_parent_current_vertex_idx < (self._tsp.no_vertices - 1) else first_parent.permutation[0]
             second_parent_edge_endpoint = second_parent.permutation[second_parent_current_vertex_idx + 1] if second_parent_current_vertex_idx < (self._tsp.no_vertices - 1) else second_parent.permutation[0]
-            first_parent_edge_length = self._tsp.distance_matrix[first_parent_edge_endpoint, current_vertex]
-            second_parent_edge_length = self._tsp.distance_matrix[second_parent_edge_endpoint, current_vertex]
+            first_parent_edge_length = self._tsp.distance_matrix[current_vertex, first_parent_edge_endpoint]
+            second_parent_edge_length = self._tsp.distance_matrix[current_vertex, second_parent_edge_endpoint]
             
             if (first_parent_edge_endpoint in child_permutation) and (second_parent_edge_endpoint in child_permutation):
                 possible_endpoints = [edge_endpoint for edge_endpoint in range(self._tsp.no_vertices) if edge_endpoint not in child_permutation and edge_endpoint != current_vertex]
-                possible_edge_lenghts = [self._tsp.distance_matrix[possible_endpoint, current_vertex] for possible_endpoint in possible_endpoints]
+                possible_edge_lenghts = [self._tsp.distance_matrix[current_vertex, possible_endpoint] for possible_endpoint in possible_endpoints]
                 chosen_endpoint = possible_endpoints[np.argmin(possible_edge_lenghts)]
                 child_permutation.append(chosen_endpoint)
                 current_vertex = chosen_endpoint
@@ -159,14 +159,14 @@ class r0123456:
 
         current_vertex = starting_vertex
         nn_solution[i] = current_vertex
-        edge_weights = np.copy(self._tsp.distance_matrix[:, current_vertex])
+        edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
         edge_weights[current_vertex] = np.Inf
         next_vertex = np.argmin(edge_weights)
         i += 1
         while next_vertex != starting_vertex:
             current_vertex = next_vertex
             nn_solution[i] = current_vertex
-            edge_weights = np.copy(self._tsp.distance_matrix[:, current_vertex])
+            edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
             edge_weights[current_vertex] = np.Inf
             next_vertex = np.argmin(edge_weights)
             i += 1
