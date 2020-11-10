@@ -51,26 +51,28 @@ class r0123456:
 
             self._population = Population(self._elimination(offspring))
 
-            current_mean_fitness = TSP.mean_fitness(self._population.individuals)
-            current_best_fitness = TSP.best_fitness(self._population.individuals)
+            current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
+            current_best_fitness = self._tsp.best_fitness(self._population.individuals)
 
             previous_change = current_change
             current_change = previous_mean_fitness - current_mean_fitness
             if math.isnan(previous_change):
                 change_ratio = float('inf')
             else:
-                change_ratio = math.abs(current_change / previous_change)
+                change_ratio = abs(current_change / previous_change)
 
             # Call the reporter with:
             #  - the mean objective function value of the population
             #  - the best objective function value of the population
             #  - a 1D numpy array in the cycle notation containing the best solution 
             #    with city numbering starting from 0
-            timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, TSP.best_individual(self._population.individuals).permutation)
+            timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, self._tsp.best_individual(self._population.individuals).permutation)
             if timeLeft < 0:
                 break
 
         # Your code here. (finalization & cleanup)
+        print("Finished")
+        
         return 0
 
     def _initialize_population(self):
@@ -105,16 +107,16 @@ class r0123456:
         current_vertex = np.random.randint(self._tsp.no_vertices)
         child_permutation.append(current_vertex)
         for _ in range(self._tsp.no_vertices - 1):
-            first_parent_current_vertex_idx = first_parent.permutation.index(current_vertex)
-            second_parent_current_vertex_idx = second_parent.permutation.index(current_vertex)
+            first_parent_current_vertex_idx = np.where(first_parent.permutation == current_vertex)[0][0]
+            second_parent_current_vertex_idx = np.where(second_parent.permutation == current_vertex)[0][0]
             first_parent_edge_endpoint = first_parent.permutation[first_parent_current_vertex_idx + 1] if first_parent_current_vertex_idx < (self._tsp.no_vertices - 1) else first_parent.permutation[0]
             second_parent_edge_endpoint = second_parent.permutation[second_parent_current_vertex_idx + 1] if second_parent_current_vertex_idx < (self._tsp.no_vertices - 1) else second_parent.permutation[0]
-            first_parent_edge_length = self._tsp.distance_matrix[current_vertex, first_parent_edge_endpoint]
-            second_parent_edge_length = self._tsp.distance_matrix[current_vertex, second_parent_edge_endpoint]
+            first_parent_edge_length = self._tsp.distance_matrix[int(current_vertex), int(first_parent_edge_endpoint)]
+            second_parent_edge_length = self._tsp.distance_matrix[int(current_vertex), int(second_parent_edge_endpoint)]
             
             if (first_parent_edge_endpoint in child_permutation) and (second_parent_edge_endpoint in child_permutation):
                 possible_endpoints = [edge_endpoint for edge_endpoint in range(self._tsp.no_vertices) if edge_endpoint not in child_permutation and edge_endpoint != current_vertex]
-                possible_edge_lenghts = [self._tsp.distance_matrix[current_vertex, possible_endpoint] for possible_endpoint in possible_endpoints]
+                possible_edge_lenghts = [self._tsp.distance_matrix[int(current_vertex), int(possible_endpoint)] for possible_endpoint in possible_endpoints]
                 chosen_endpoint = possible_endpoints[np.argmin(possible_edge_lenghts)]
                 child_permutation.append(chosen_endpoint)
                 current_vertex = chosen_endpoint
