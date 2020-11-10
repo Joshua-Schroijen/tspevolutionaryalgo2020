@@ -32,8 +32,8 @@ class r0123456:
         self._population_size = self._population_size_factor * self._tsp.no_vertices
         self._initialize_population()
 
-        current_mean_fitness = TSP.mean_fitness(self._population.individuals)
-        current_best_fitness = TSP.best_fitness(self._population.individuals)
+        current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
+        current_best_fitness = self._tsp.best_fitness(self._population.individuals)
         current_change = math.nan
         change_ratio = float('inf')
         while( change_ratio > self._stopping_ratio ):
@@ -81,7 +81,7 @@ class r0123456:
         
         for _ in range(self._population_size_factor - 1):
             for vertex in range(self._tsp.no_vertices):
-                permutation = starting_individuals[vertex]
+                permutation = starting_individuals[vertex].permutation
                 no_random_swaps = max(1, min(np.random.poisson(math.floor(self._population_size / 4)), self._population_size))
                 
                 for _ in range(no_random_swaps):
@@ -89,8 +89,8 @@ class r0123456:
                     b = np.random.randint(0, self._tsp.no_vertices)
                     permutation = self.__get_swapped(permutation, a, b)
                 
-                starting_individuals.append(permutation)
-            
+                starting_individuals.append(Individual(permutation))
+
         self._population = Population(starting_individuals)
 
     def _selection(self):
@@ -156,39 +156,24 @@ class r0123456:
     def __get_nearest_neighbour_solution(self, starting_vertex):
         nn_solution = np.empty(self._tsp.no_vertices)
         visited = []
-        i = 0
 
         current_vertex = starting_vertex
         visited.append(current_vertex)
-        nn_solution[i] = current_vertex
+        nn_solution[0] = current_vertex
         edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
         edge_weights[visited] = np.Inf
         next_vertex = np.argmin(edge_weights)
-        i += 1
-        while next_vertex != starting_vertex:
+        for i in range(1, self._tsp.no_vertices):
             current_vertex = next_vertex
             visited.append(current_vertex)
             nn_solution[i] = current_vertex
             edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
             edge_weights[visited] = np.Inf
             next_vertex = np.argmin(edge_weights)
-            i += 1
 
-        return nn_solution
+        return Individual(nn_solution)
 
 class TSP:
-    @staticmethod
-    def mean_fitness(self, individuals):
-        return statistics.mean([self.fitness(individual) for individual in individuals])
-    
-    @staticmethod
-    def best_fitness(self, individuals):
-        return max([self.fitness(individual) for individual in individuals])
-
-    @staticmethod
-    def best_individual(self, individuals):
-        return individuals[np.argmax([self.fitness(individual) for individual in individuals])]
-
     def __init__(self, distance_matrix):
         self._distance_matrix = distance_matrix
 
@@ -200,7 +185,16 @@ class TSP:
         total_distance += self._distance_matrix[b, individual.permutation[0]]
 
         return total_distance
-   
+
+    def mean_fitness(self, individuals):
+        return statistics.mean([self.fitness(individual) for individual in individuals])
+    
+    def best_fitness(self, individuals):
+        return max([self.fitness(individual) for individual in individuals])
+
+    def best_individual(self, individuals):
+        return individuals[np.argmax([self.fitness(individual) for individual in individuals])]
+
     @property
     def distance_matrix(self):
         return self._distance_matrix
@@ -215,7 +209,7 @@ class TSP:
 
 class Individual:
     def __init__(self, permutation, mutation_chance = 0.05):
-        self._permutation = order
+        self._permutation = permutation
         self._mutation_chance = mutation_chance
 
     @property
