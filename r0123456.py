@@ -5,7 +5,7 @@ import timeit
 import numpy as np
 import matplotlib.pyplot as plt
 import Reporter
-
+# this is a comment
 class r0123456:
     @staticmethod
     def __get_swapped(permutation, a, b):
