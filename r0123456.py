@@ -1,6 +1,7 @@
 import math
 import statistics
 import itertools
+import timeit
 import numpy as np
 import matplotlib.pyplot as plt
 import Reporter
@@ -27,7 +28,8 @@ class r0123456:
         
     def optimize(self, filename):
         print("Starting evolutionary algorithm ...")
-        
+        start_time = timeit.default_timer()
+
         file = open(filename)
         distanceMatrix = np.loadtxt(file, delimiter=",")
         file.close()
@@ -36,7 +38,7 @@ class r0123456:
         self._population_size = self._population_size_factor * self._tsp.no_vertices
         
         nn_mean_fitness, nn_best_fitness = self._get_benchmarks()
-        print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness}\n\tBest heuristic fitness = {nn_best_fitness}")
+        print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness:.5f}\n\tBest heuristic fitness = {nn_best_fitness:.5f}")
          
         self._initialize_population()
         
@@ -85,12 +87,23 @@ class r0123456:
             #  - a 1D numpy array in the cycle notation containing the best solution 
             #    with city numbering starting from 0
             timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, self._tsp.best_individual(self._population.individuals).permutation)
-            print(f"Iteration complete. Change ratio = {change_ratio}, time left = {timeLeft}")
-            print(f"\tCurrent mean fitness = {current_mean_fitness}, best mean fitness = {current_best_fitness}")
+            print(f"Iteration complete. Change ratio = {change_ratio:.5f}, time left = {timeLeft:.3f} seconds")
+            print(f"\tCurrent mean fitness = {current_mean_fitness:.5f}, current best fitness = {current_best_fitness:.5f}")
             if timeLeft < 0:
                 break
 
-        print("Evolutionary algorithm finished")
+        elapsed = timeit.default_timer() - start_time
+        print(f"Evolutionary algorithm finished in {elapsed:.3f} seconds")
+        last_mean_performance_difference_with_heuristic = 1 - (current_mean_fitness / nn_mean_fitness)
+        last_best_performance_difference_with_heuristic = 1 - (current_best_fitness / nn_best_fitness)
+        report = f"Last iteration mean fitness was {last_mean_performance_difference_with_heuristic * 100:.2f}% "
+        report += "better" if last_mean_performance_difference_with_heuristic >= 0 else "worse"
+        report += " than mean heuristic solution fitness"
+        print(report)
+        report = f"Last iteration best fitness was {last_best_performance_difference_with_heuristic * 100:.2f}% "
+        report += "better" if last_best_performance_difference_with_heuristic >= 0 else "worse"
+        report += " than best heuristic solution fitness"
+        print(report)
 
         plt.figure()
         plt.plot(iteration_numbers, mean_fitnesses, label="Mean fitness")
