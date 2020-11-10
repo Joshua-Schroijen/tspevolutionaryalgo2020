@@ -155,19 +155,22 @@ class r0123456:
 
     def __get_nearest_neighbour_solution(self, starting_vertex):
         nn_solution = np.empty(self._tsp.no_vertices)
+        visited = []
         i = 0
 
         current_vertex = starting_vertex
+        visited.append(current_vertex)
         nn_solution[i] = current_vertex
         edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
-        edge_weights[current_vertex] = np.Inf
+        edge_weights[visited] = np.Inf
         next_vertex = np.argmin(edge_weights)
         i += 1
         while next_vertex != starting_vertex:
             current_vertex = next_vertex
+            visited.append(current_vertex)
             nn_solution[i] = current_vertex
             edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
-            edge_weights[current_vertex] = np.Inf
+            edge_weights[visited] = np.Inf
             next_vertex = np.argmin(edge_weights)
             i += 1
 
