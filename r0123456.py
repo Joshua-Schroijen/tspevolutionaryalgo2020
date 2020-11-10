@@ -1,6 +1,8 @@
 import math
 import statistics
+import itertools
 import numpy as np
+import matplotlib.pyplot as plt
 import Reporter
 
 class r0123456:
@@ -37,9 +39,13 @@ class r0123456:
         print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness}\n\tBest heuristic fitness = {nn_best_fitness}")
          
         self._initialize_population()
-
+        
         current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
         current_best_fitness = self._tsp.best_fitness(self._population.individuals)
+        iteration_number = 0
+        iteration_numbers = [iteration_number]
+        mean_fitnesses = [current_mean_fitness]
+        best_fitnesses = [current_best_fitness]
         current_change = math.nan
         change_ratio = float('inf')
         print("Entering main loop")
@@ -61,6 +67,11 @@ class r0123456:
             current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
             current_best_fitness = self._tsp.best_fitness(self._population.individuals)
 
+            iteration_number += 1
+            iteration_numbers.append(iteration_number)
+            mean_fitnesses.append(current_mean_fitness)
+            best_fitnesses.append(current_best_fitness)
+        
             previous_change = current_change
             current_change = previous_mean_fitness - current_mean_fitness
             if math.isnan(previous_change):
@@ -80,6 +91,33 @@ class r0123456:
                 break
 
         print("Evolutionary algorithm finished")
+
+        plt.figure()
+        plt.plot(iteration_numbers, mean_fitnesses, label="Mean fitness")
+        plt.hlines(nn_mean_fitness, 0, len(iteration_numbers) - 1, label="Mean heuristic fitness", colors="r")
+        plt.title('Mean fitness vs. iteration')
+        plt.legend()
+        plt.xlabel("Iteration")
+        plt.ylabel("Fitness")
+        plt.xlim([0, len(iteration_numbers) - 1])
+        lower_y_bound = min(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 0.8
+        upper_y_bound = max(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 1.2
+        plt.ylim([lower_y_bound, upper_y_bound])
+        plt.xticks(range(0, len(iteration_numbers) , 1))
+        plt.savefig('r0123456_means.png')
+        plt.figure()
+        plt.plot(iteration_numbers, best_fitnesses, label="Best fitness")
+        plt.hlines(nn_best_fitness, 0, len(iteration_numbers) - 1, label="Best heuristic fitness", colors="r")
+        plt.title('Best fitness vs. iteration')
+        plt.legend()
+        plt.xlabel("Iteration")
+        plt.ylabel("Fitness")
+        plt.xlim([0, len(iteration_numbers) - 1])
+        lower_y_bound = min(itertools.chain(best_fitnesses, [nn_best_fitness])) * 0.8
+        upper_y_bound = max(itertools.chain(best_fitnesses, [nn_best_fitness])) * 1.2
+        plt.ylim([lower_y_bound, upper_y_bound])
+        plt.xticks(range(0, len(iteration_numbers), 1))
+        plt.savefig('r0123456_bests.png')
 
         return 0
 
