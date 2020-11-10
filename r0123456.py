@@ -13,7 +13,7 @@ class r0123456:
         permutation_copy[[b, a]] = permutation_copy[[a, b]]
         return permutation_copy
 
-    def __init__(self, population_size_factor = 5, k = 5, mu = 100, no_individuals_to_keep = 100, stopping_ratio = 0.01):
+    def __init__(self, population_size_factor = 5, k = 5, mu = 100, no_individuals_to_keep = 100, stopping_ratio = 0.001):
         self.reporter = Reporter.Reporter(self.__class__.__name__)
 
         self._population_size_factor = population_size_factor
