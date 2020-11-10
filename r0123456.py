@@ -71,8 +71,6 @@ class r0123456:
                 break
 
         # Your code here. (finalization & cleanup)
-        print("Finished")
-        
         return 0
 
     def _initialize_population(self):
@@ -152,7 +150,7 @@ class r0123456:
         combined.extend(offspring)
         combined = np.array(combined)
         
-        selected = np.flip(np.argsort(np.array(list(map(lambda individual: self._tsp.fitness(individual), combined)))))[0:self._no_individuals_to_keep]
+        selected = np.argsort(np.array(list(map(lambda individual: self._tsp.fitness(individual), combined))))[0:self._no_individuals_to_keep]
         return list(combined[selected])
 
     def __get_nearest_neighbour_solution(self, starting_vertex):
