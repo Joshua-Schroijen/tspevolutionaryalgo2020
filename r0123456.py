@@ -1,7 +1,9 @@
 import math
 import statistics
+import collections
 import itertools
 import timeit
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import Reporter
@@ -29,7 +31,7 @@ class r0123456:
         # Return the copied permutation with the given elements swapped
         return permutation_copy
 
-    def __init__(self, population_size_factor = 5, k = 5, mu = 100, no_individuals_to_keep = 100, stopping_ratio = 0.001):
+    def __init__(self, population_size_factor = 5, k = 5, mu = 100, no_individuals_to_keep = 100, stopping_ratio = 0.001, tolerances = 3):
         """
         Constructs the evolutionary algorithm object
         
@@ -37,7 +39,8 @@ class r0123456:
         :param k: tournament size for k-tournament selection (default = 5)
         :param mu: number of offspring to generate from the population (default = 100)
         :param no_individuals_to_keep: number of individuals to keep in elimination steps (default = 100)
-        :param stopping_ratio: the relative improvement in the current iteration compared to the previous one below which to stop optimization (default = 0.001)
+        :param stopping_ratio: the relative improvement in the current iteration compared to the previous one below which, after tolerances iterations, to stop optimization (default = 0.001)
+        :param tolerances: the number of iterations ran below the stopping ratio before optimization is stopped (default = 0.001)
         :return: an initialized evolutionary algorithm object of class r0123456
         """
         
@@ -50,6 +53,7 @@ class r0123456:
         self._mu = mu
         self._no_individuals_to_keep = no_individuals_to_keep
         self._stopping_ratio = stopping_ratio
+        self._tolerances = tolerances
 
         # Initialize remaining attributes
         self._population = None
@@ -93,8 +97,10 @@ class r0123456:
         best_fitnesses = [current_best_fitness]
         current_change = math.nan
         change_ratio = float('inf')
+        change_ratios = FixedSizeStack(self._tolerances)
+        change_ratios.push(change_ratio)
         print("Entering main loop")
-        while( change_ratio > self._stopping_ratio ): # Iterate while change ratio is large enough, keep optimizing
+        while( any([cr > self._stopping_ratio for cr in change_ratios]) ): # Keep optimizing while change ratio is large enough
             previous_mean_fitness = current_mean_fitness
             previous_best_fitness = current_best_fitness
 
@@ -128,7 +134,8 @@ class r0123456:
             if math.isnan(previous_change):
                 change_ratio = float('inf')
             else:
-                change_ratio = abs(current_change / previous_change)
+                change_ratio = abs(current_change) / (abs(previous_change) + sys.float_info.epsilon)
+            change_ratios.push(change_ratio)
 
             # Call the reporter with:
             #  - the mean objective function value of the population
@@ -517,3 +524,38 @@ class Population:
     @individuals.setter
     def individuals(self, individuals):
         self._individuals = individuals
+        
+class FixedSizeStack:
+    """
+    This class implements a very simple iterable fixed size stack (to which you can only push) of variable size N
+    
+    Once more than N elements are pushed onto this stack, elements from the bottom are discarded to make space for them
+    """
+
+    def __init__(self, N):
+        self._N = N
+        self._internal_deque = collections.deque()
+        self._elements_pushed = 0
+
+    def push(self, e):
+        """
+        Pushes an element onto the fixed size stack
+
+        :param e: object to push onto the fixed size stack
+        """
+   
+        if self._elements_pushed >= self._N:
+            self._internal_deque.popleft()
+
+        self._internal_deque.append(e)     
+        
+        self._elements_pushed += 1
+        
+    # Method needed to make objects of this class iterable
+    def __iter__(self):
+        # Just return the iterator provided by the deque class
+        return iter(self._internal_deque)
+
+    @property
+    def N(self):
+        return self._N
