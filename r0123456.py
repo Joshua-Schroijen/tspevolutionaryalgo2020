@@ -6,6 +6,7 @@ import timeit
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+import profile_decorator
 import Reporter
 
 class r0123456:
@@ -60,6 +61,7 @@ class r0123456:
         self._tsp = None
         self._population_size = math.nan
         
+    @profile_decorator.profile("algorithm_profile.txt")
     def optimize(self, filename):
         """
         Runs the evolutionary algorithm and reports its' results
