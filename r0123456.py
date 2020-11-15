@@ -60,6 +60,7 @@ class r0123456:
         self._population = None
         self._tsp = None
         self._population_size = math.nan
+        self._type_recombination = 'PMX1'   # PMX1 or  HGreX1
         
     @profile_decorator.profile("algorithm_profile.txt")
     def optimize(self, filename):
@@ -108,12 +109,25 @@ class r0123456:
 
             # Create μ offspring of the current population
             offspring = []
-            for _ in range(self._mu):
-                # Select two parents
-                first_parent = self._selection()
-                second_parent = self._selection()
-                # Recombine them, mutate the recombination and save the resulting offspring
-                offspring.append(self._mutation(self._recombination(first_parent, second_parent)))
+            if self._type_recombination == 'HGreX1':
+                for _ in range(self._mu):
+                    # Select two parents
+                    first_parent = self._selection()
+                    second_parent = self._selection()
+                    # Recombine them, mutate the recombination and save the resulting offspring
+                    offspring.append(self._mutation(self._recombination(first_parent, second_parent)))
+            elif self._type_recombination == 'PMX1':
+                two_individuals = []
+                for _ in range(int(self._mu/2)):
+                    # Select two parents
+                    first_parent = self._selection()
+                    second_parent = self._selection()
+                    # Recombine them, mutate the recombination and save the resulting offspring
+                    two_individuals = self._recombinationPMX1(first_parent, second_parent)   #  PMX recombination results in two symmetric childs
+                    for ind, individual in enumerate(two_individuals):
+                        offspring.append(self._mutation(individual))
+            else:
+                pass
 
             # Apply random mutation to each member of the population
             for idx, individual in enumerate(self._population):
@@ -331,6 +345,53 @@ class r0123456:
         # Return a new Individual object based on the recombined child permutation and mutation chance
         return Individual(np.array(child_permutation), child_mutation_chance)
         
+    def _recombinationPMX1(self,first_parent,second_parent):
+        # Choose a random index vertex
+        index_vertex1 = np.random.randint(self._tsp.no_vertices)
+        # Choose another random index vertex
+        index_vertex2 = index_vertex1
+        # Make sure that the second crossoverpoint is different from the first corssoverpoint
+        while index_vertex1 == index_vertex2:
+            index_vertex2 = np.random.randint(self._tsp.no_vertices) # Choose another random index vertex
+        # begin index has to be the smallest value, so sort the indices
+        index_begin, index_end = np.sort(np.array([index_vertex1,index_vertex2]))
+        # ##### check if the same index, then decide what to do... #####
+        ############################
+        # determine first and second child respectively, which are kind of symmetric
+        child1 = self._PMXimplementation(first_parent,second_parent,index_begin,index_end)
+        child2 = self._PMXimplementation(second_parent, first_parent, index_begin, index_end)
+        return [child1,child2]
+
+    def _PMXimplementation(self,first_parent,second_parent,index_begin,index_end):
+        child_permutation = [None]*self._tsp.no_vertices   # child permutation will be a list of integers (not numpy list)
+        # Copy the segment of parent 1 into the offspring
+        child_permutation[index_begin:index_end+1] = first_parent.permutation[index_begin:index_end+1]
+        covered_area = [*range(index_begin,index_end+1)]   # keep track of what is already covered in child_permutation
+        # loop over the elements of parent 2 at the segment locations
+        for idx in range(index_begin,index_end+1):
+            if second_parent.permutation[idx] in first_parent.permutation[index_begin:index_end+1]:
+                pass   # this value has already found a place in the new child.
+            else:
+                idx_search = idx
+                location_found = False
+                while not location_found:
+                    idx_found = np.where(second_parent.permutation == child_permutation[idx_search])[0][0]
+                    if child_permutation[idx_found] != None:    # found location in offspring is already occupied
+                        idx_search = idx_found   # set index to be able to look for the new found value.
+                    else:
+                        location_found = True
+                        covered_area.append(idx_found)
+                child_permutation[idx_found] = second_parent.permutation[idx]  # assign the new location of this value.
+        # Determine which are the remaining elements of parent 2 to be copied to the offspring.
+        idx_to_be_copied = list(set([*range(0,self._tsp.no_vertices)]) - set(covered_area))  # full list minus covered area
+        # copy the remaining elements into the child.
+        for ind in idx_to_be_copied:
+            child_permutation[ind] = second_parent.permutation[ind]
+
+        # Recombine the child's mutation chance with a blend recombination
+        child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
+        return Individual(np.array(child_permutation), child_mutation_chance)
+
     def _mutation(self, individual):
         """
         Performs a random swap mutation on an Individual object with its mutation chance
