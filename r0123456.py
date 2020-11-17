@@ -32,7 +32,7 @@ class r0123456:
         # Return the copied permutation with the given elements swapped
         return permutation_copy
 
-    def __init__(self, population_size_factor = 5, k = 5, mu = 100, no_individuals_to_keep = 100, stopping_ratio = 0.001, tolerances = 3):
+    def __init__(self, population_size_factor, k, mu, no_individuals_to_keep, stopping_ratio, tolerances):
         """
         Constructs the evolutionary algorithm object
         
@@ -55,7 +55,7 @@ class r0123456:
         self._no_individuals_to_keep = no_individuals_to_keep
         self._stopping_ratio = stopping_ratio
         self._tolerances = tolerances
-
+        # print(population_size_factor, k, mu, no_individuals_to_keep, stopping_ratio, tolerances)
         # Initialize remaining attributes
         self._population = None
         self._tsp = None
