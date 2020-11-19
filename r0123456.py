@@ -216,7 +216,10 @@ class r0123456:
         plt.xlabel('Distance to identity permutation')
         plt.ylabel('# individuals')
         plt.savefig('r0123456_last_distribution.png')
-        
+
+        # Write the last population's contents to r0123456_last_population.txt        
+        self._population.write_to_file("r0123456_last_population.txt")
+
         # Return performance results of the optimization
         return (current_mean_fitness, current_best_fitness)
 
@@ -627,6 +630,16 @@ class Population:
             bins[distance_to_identity] += 1
 
         return bins
+
+    def write_to_file(self, filename):
+        """
+        Writes the population content out to the file specified in filename
+        """
+        file = open(filename, "w")
+        for individual in self._individuals:
+            file.write(np.array_str(individual.permutation))
+
+        file.close()
 
     @property
     def individuals(self):
