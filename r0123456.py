@@ -134,7 +134,7 @@ class r0123456:
                 self._population.individuals[idx] = self._mutation(individual)
 
             # Apply elimination to the current population and its offspring, forming the new population
-            self._population = Population(self._elimination(offspring))
+            self._population = Population(self._elimination(offspring), self._tsp.no_vertices)
 
             # Determine change ratio
             current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
@@ -209,6 +209,14 @@ class r0123456:
         plt.xticks(range(0, len(iteration_numbers), 1))
         plt.savefig('r0123456_bests.png')
 
+        # Plot the final population distribution and save it to r0123456_last_distribution.png
+        plt.figure()
+        plt.bar(range(self._tsp.no_vertices), self._population.get_distribution())
+        plt.title('Distribution of individuals')
+        plt.xlabel('Distance to identity permutation')
+        plt.ylabel('# individuals')
+        plt.savefig('r0123456_last_distribution.png')
+        
         # Return performance results of the optimization
         return (current_mean_fitness, current_best_fitness)
 
@@ -259,7 +267,7 @@ class r0123456:
                 starting_individuals.append(Individual(permutation))
 
         # Set the population attribute to the initial population generated in this method
-        self._population = Population(starting_individuals)
+        self._population = Population(starting_individuals, self._tsp.no_vertices)
 
     def _selection(self):
         """
@@ -549,7 +557,32 @@ class Individual:
 
     def __init__(self, permutation, mutation_chance = 0.05):
         self._permutation = permutation
-        self._mutation_chance = mutation_chance
+        self._mutation_chance = mutation_chance                                                                                     # 
+
+    def distance_to_identity(self):
+        """
+        Returns the number of swaps needed to transform the identity permutation into the individual's permutation
+        
+        :return: the number of swaps needed to transform the identity permutation into the individual's permutation
+        """
+        # The key idea of this implementation is the fact that the number of swaps required to transform the identity
+        # permutation into a given permutation is equal to the length of the permutation - its number of cycles
+        no_cycles = 0
+        identity_vertices = [{ "vertex": vertex, "visited": False } for vertex in range(np.size(self._permutation))]
+        
+        for current_identity_vertex in identity_vertices:
+            if current_identity_vertex["visited"] == False:
+                # Count the cycles
+                current_vertex = self._permutation[current_identity_vertex["vertex"]]
+                while current_vertex != current_identity_vertex["vertex"]:
+                    identity_vertices[int(current_vertex)]["visited"] = True
+                    current_vertex = self._permutation[int(current_vertex)]
+                
+                current_identity_vertex["visited"] = True
+                
+                no_cycles += 1
+        
+        return np.size(self._permutation) - no_cycles
 
     @property
     def permutation(self):
@@ -572,13 +605,28 @@ class Population:
     This class holds a collection of individuals
 
     :attribute individuals: a Python list of Individual objects
+    :attribute no_vertices: the number of vertices in an Individual
     """
-
-    def __init__(self, individuals):
+    
+    def __init__(self, individuals, no_vertices):
         self._individuals = individuals
+        self._no_vertices = no_vertices
 
     def __iter__(self):
         return iter(self._individuals)
+
+    def get_distribution(self):
+        """
+        Returns the number of individuals at different Hamming distances from the identity permutation
+
+        :return: the number of individuals at different Hamming distances from the identity permutation as a Python list
+        """
+        bins = [0] * self._no_vertices
+        
+        for distance_to_identity in [individual.distance_to_identity() for individual in self._individuals]:
+            bins[distance_to_identity] += 1
+
+        return bins
 
     @property
     def individuals(self):
@@ -587,7 +635,7 @@ class Population:
     @individuals.setter
     def individuals(self, individuals):
         self._individuals = individuals
-        
+    
 class FixedSizeStack:
     """
     This class implements a very simple iterable fixed size stack (to which you can only push) of variable size N
