@@ -102,6 +102,7 @@ class r0123456:
         change_ratio = float('inf')
         change_ratios = FixedSizeStack(self._tolerances)
         change_ratios.push(change_ratio)
+        stdev_hamming_distances = [self._population.get_stdev_distance_to_identity()]
         print("Entering main loop")
         while( any([cr > self._stopping_ratio for cr in change_ratios]) ): # Keep optimizing while change ratio is large enough
             previous_mean_fitness = current_mean_fitness
@@ -152,6 +153,8 @@ class r0123456:
             else:
                 change_ratio = abs(current_change) / (abs(previous_change) + sys.float_info.epsilon)
             change_ratios.push(change_ratio)
+
+            stdev_hamming_distances.append(self._population.get_stdev_distance_to_identity())
 
             # Call the reporter with:
             #  - the mean objective function value of the population
@@ -209,6 +212,18 @@ class r0123456:
         plt.xticks(range(0, len(iteration_numbers), 1))
         plt.savefig('r0123456_bests.png')
 
+        # Plot the evolution of the standard deviation of the Hamming distances to the identity permutations
+        plt.figure()
+        plt.plot(iteration_numbers, stdev_hamming_distances, label="σ of Hamming distances to the identity permutation")
+        plt.title('σ of Hamming distances to the identity permutation vs. iteration')
+        plt.legend()
+        plt.xlabel("Iteration")
+        plt.ylabel("σ")
+        plt.xlim([0, len(iteration_numbers) - 1])
+        plt.ylim([0, self._tsp.no_vertices - 1])
+        plt.xticks(range(0, len(iteration_numbers), 1))
+        plt.savefig('r0123456_stdev_distances.png')
+        
         # Plot the final population distribution and save it to r0123456_last_distribution.png
         plt.figure()
         plt.bar(range(self._tsp.no_vertices), self._population.get_distribution())
@@ -630,6 +645,14 @@ class Population:
             bins[distance_to_identity] += 1
 
         return bins
+        
+    def get_stdev_distance_to_identity(self):
+        """
+        Returns the standard deviation of the Hamming distances to the identity permutation
+
+        :return: the standard deviation of the Hamming distances to the identity permutation
+        """
+        return statistics.stdev([individual.distance_to_identity() for individual in self._individuals])
 
     def write_to_file(self, filename):
         """
