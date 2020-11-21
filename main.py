@@ -8,13 +8,13 @@ def takeMeanfitness(elem):
 
 if __name__ == '__main__':
   os.system('clear')
-  
+
   test_data_file = ''
   optimize_hyperparameters = False
-  population_size_factor = 5
+  population_size_factor = 6
   k = 5
-  mu = 100
-  no_individuals_to_keep = 100
+  mu = 110
+  no_individuals_to_keep = 110
   stopping_ratio = 0.001
   tolerances = 3
   
