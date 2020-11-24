@@ -15,6 +15,8 @@ if __name__ == '__main__':
   k = 5
   mu = 110
   no_individuals_to_keep = 110
+  mutation_chance = 0.05
+  mutation_chance_self_adaptivity = False
   stopping_ratio = 0.001
   tolerances = 3
   
@@ -22,14 +24,16 @@ if __name__ == '__main__':
     opts, _ = getopt.getopt(sys.argv[1:], "oi:p:k:mu:nitk:sr:t:", ["optimize-hyperparameters", "input="])
   except getopt.GetoptError:
     print("Error: wrong command-line arguments. Supported arguments:")
-    print("\t-i File containing the problem (required)")
-    print("\t-p Population size factor (optional)")
-    print("\t-k K for k-tournament selection (optional)")
-    print("\t-mu Mu for number of offspring (optional)")
+    print("\t-i    File containing the problem (required)")
+    print("\t-p    Population size factor (optional)")
+    print("\t-k    K for k-tournament selection (optional)")
+    print("\t-mu   Mu for number of offspring (optional)")
     print("\t-nitk The number of individuals to keep (optional)")
-    print("\t-sr The stopping ratio (optional)")
-    print("\t-t The number of stopping ratio tolerances (optional)")
-    print("\t-o Optimize hyperparameters (optional)")
+    print("\t-mc   The default mutation chance (optional)")
+    print("\t-mcsa Enable mutation chance self-adaptivity (optional)")
+    print("\t-sr   The stopping ratio (optional)")
+    print("\t-t    The number of stopping ratio tolerances (optional)")
+    print("\t-o    Optimize hyperparameters (optional)")
     sys.exit(2)
   for opt, arg in opts:
     if   opt in ("-o", "optimize-hyperparameters"):
@@ -42,6 +46,10 @@ if __name__ == '__main__':
       mu = int(arg)
     elif opt in ("-nitk"):
       no_individuals_to_keep = int(arg)
+    elif opt in ("-mc"):
+      mutation_chance = float(arg)
+    elif opt in ("-mcsa"):
+      mutation_chance_self_adaptivity = True
     elif opt in ("-sr"):
       stopping_ratio = float(arg)
     elif opt in ("-t"):
@@ -96,4 +104,4 @@ if __name__ == '__main__':
       print(p)
       
   else:
-    r0123456.r0123456(population_size_factor = population_size_factor, k = k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)
+    r0123456.r0123456(population_size_factor = population_size_factor, k = k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, mutation_chance = mutation_chance, mutation_chance_self_adaptivity = mutation_chance_self_adaptivity, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)

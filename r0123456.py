@@ -32,16 +32,18 @@ class r0123456:
         # Return the copied permutation with the given elements swapped
         return permutation_copy
 
-    def __init__(self, population_size_factor, k, mu, no_individuals_to_keep, stopping_ratio, tolerances):
+    def __init__(self, population_size_factor, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
         """
         Constructs the evolutionary algorithm object
         
-        :param population_size_factor: population size is number of vertices in problem * this parameter (default = 5)
-        :param k: tournament size for k-tournament selection (default = 5)
-        :param mu: number of offspring to generate from the population (default = 100)
-        :param no_individuals_to_keep: number of individuals to keep in elimination steps (default = 100)
-        :param stopping_ratio: the relative improvement in the current iteration compared to the previous one below which, after tolerances iterations, to stop optimization (default = 0.001)
-        :param tolerances: the number of iterations ran below the stopping ratio before optimization is stopped (default = 0.001)
+        :param population_size_factor: population size is number of vertices in problem * this parameter
+        :param k: tournament size for k-tournament selection
+        :param mu: number of offspring to generate from the population
+        :param no_individuals_to_keep: number of individuals to keep in elimination steps
+        :param mutation_chance: number between 0 and 1 representing the chance of mutation
+        :param mutation_chance_self_adaptivity: if set to True, mutation chance self-adaptivity is enabled
+        :param stopping_ratio: the relative improvement in the current iteration compared to the previous one below which, after tolerances iterations, to stop optimization
+        :param tolerances: the number of iterations ran below the stopping ratio before optimization is stopped
         :return: an initialized evolutionary algorithm object of class r0123456
         """
         
@@ -53,6 +55,8 @@ class r0123456:
         self._k = k
         self._mu = mu
         self._no_individuals_to_keep = no_individuals_to_keep
+        self._mutation_chance = mutation_chance
+        self._mutation_chance_self_adaptivity = mutation_chance_self_adaptivity
         self._stopping_ratio = stopping_ratio
         self._tolerances = tolerances
         # print(population_size_factor, k, mu, no_individuals_to_keep, stopping_ratio, tolerances)
@@ -282,7 +286,7 @@ class r0123456:
                     permutation = self.__get_swapped(permutation, a, b)
                 
                 # Add the new, mutated version of the current member to the population
-                starting_individuals.append(Individual(permutation))
+                starting_individuals.append(Individual(permutation, self._mutation_chance))
 
         # Set the population attribute to the initial population generated in this method
         self._population = Population(starting_individuals, self._tsp.no_vertices)
@@ -365,9 +369,11 @@ class r0123456:
                     # Go to next vertex
                     current_vertex = second_parent_edge_endpoint
                   
-        # Recombine the child's mutation chance with a blend recombination                  
-        child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
-
+        # Recombine the child's mutation chance with a blend recombination if self-adaptivity is enabled             
+        if self._mutation_chance_self_adaptivity:
+          child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
+        else:
+          child_mutation_chance = self._mutation_chance
         # Return a new Individual object based on the recombined child permutation and mutation chance
         return Individual(np.array(child_permutation), child_mutation_chance)
         
@@ -414,8 +420,11 @@ class r0123456:
         for ind in idx_to_be_copied:
             child_permutation[ind] = second_parent.permutation[ind]
 
-        # Recombine the child's mutation chance with a blend recombination
-        child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
+        # Recombine the child's mutation chance with a blend recombination if self-adaptivity is enabled
+        if self._mutation_chance_self_adaptivity:
+          child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
+        else:
+          child_mutation_chance = self._mutation_chance
         return Individual(np.array(child_permutation), child_mutation_chance)
 
     def _mutation(self, individual):
@@ -491,7 +500,7 @@ class r0123456:
             edge_weights[visited] = np.Inf
             next_vertex = np.argmin(edge_weights)
 
-        return Individual(nn_solution)
+        return Individual(nn_solution, self._mutation_chance)
 
 class TSP:
     """
