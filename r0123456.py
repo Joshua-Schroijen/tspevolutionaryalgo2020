@@ -8,6 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import profile_decorator
 import Reporter
+from collections import Counter
+import pdb
+import time
 
 class r0123456:
     """
@@ -94,9 +97,9 @@ class r0123456:
         
         # Initialize the population
         self._initialize_population()
-        
+
         # Set up main loop variables
-        current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
+        current_mean_fitness = self._tsp.mean_fitness(self._population.individuals, True)
         current_best_fitness = self._tsp.best_fitness(self._population.individuals)
         iteration_number = 0
         iteration_numbers = [iteration_number]
@@ -142,14 +145,14 @@ class r0123456:
             self._population = Population(self._elimination(offspring), self._tsp.no_vertices)
 
             # Determine change ratio
-            current_mean_fitness = self._tsp.mean_fitness(self._population.individuals)
+            current_mean_fitness = self._tsp.mean_fitness(self._population.individuals, True)
             current_best_fitness = self._tsp.best_fitness(self._population.individuals)
 
             iteration_number += 1
             iteration_numbers.append(iteration_number)
             mean_fitnesses.append(current_mean_fitness)
             best_fitnesses.append(current_best_fitness)
-        
+
             previous_change = current_change
             current_change = previous_mean_fitness - current_mean_fitness
             if math.isnan(previous_change):
@@ -257,7 +260,7 @@ class r0123456:
             nn_individuals.append(self.__get_nearest_neighbour_solution(vertex))
         
         # Return the mean and best fitness of the set of nearest neighbour solutions at each possible starting vertex
-        return (self._tsp.mean_fitness(nn_individuals), self._tsp.best_fitness(nn_individuals))
+        return (self._tsp.mean_fitness(nn_individuals, True), self._tsp.best_fitness(nn_individuals))
 
     def _initialize_population(self):
         """
@@ -486,7 +489,14 @@ class r0123456:
         # Select next vertex as closest unvisited one
         edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
         edge_weights[visited] = np.Inf
-        next_vertex = np.argmin(edge_weights)
+        
+        if np.isinf(np.min(edge_weights)):
+            for v in range(np.size(edge_weights)):
+                 if v not in visited:
+                     next_vertex = v
+                     break
+        else:
+            next_vertex = np.argmin(edge_weights)
         # Traverse the remaining vertices
         for i in range(1, self._tsp.no_vertices):
             # Go to the next vertex
@@ -498,8 +508,14 @@ class r0123456:
             # Select next vertex as closest unvisited one
             edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
             edge_weights[visited] = np.Inf
-            next_vertex = np.argmin(edge_weights)
-
+            if np.isinf(np.min(edge_weights)):
+                for v in range(np.size(edge_weights)):
+                    if v not in visited:
+                        next_vertex = v
+                        break
+            else:
+                next_vertex = np.argmin(edge_weights)
+        
         return Individual(nn_solution, self._mutation_chance)
 
 class TSP:
@@ -532,16 +548,18 @@ class TSP:
 
         return total_distance
 
-    def mean_fitness(self, individuals):
+    def mean_fitness(self, individuals, filter_infeasibles=False):
         """
         Returns the mean total length of the tours represented by the different individuals
 
         :param individuals: a Python list of Individual objects
         :return: the mean total length of the tours represented by the individuals
         """
-        
-        return statistics.mean([self.fitness(individual) for individual in individuals])
-    
+        if filter_infeasibles:
+            return statistics.mean(list(filter(lambda x: not np.isinf(x),[self.fitness(individual) for individual in individuals])))
+        else:
+            return statistics.mean([self.fitness(individual) for individual in individuals])
+
     def best_fitness(self, individuals):
         """
         Returns the shortest total length of the tours represented by the different individuals
@@ -596,15 +614,17 @@ class Individual:
         # permutation into a given permutation is equal to the length of the permutation - its number of cycles
         no_cycles = 0
         identity_vertices = [{ "vertex": vertex, "visited": False } for vertex in range(np.size(self._permutation))]
-        
         for current_identity_vertex in identity_vertices:
+            # print(f'starting loop at {current_identity_vertex["vertex"]}')
             if current_identity_vertex["visited"] == False:
                 # Count the cycles
                 current_vertex = self._permutation[current_identity_vertex["vertex"]]
                 while current_vertex != current_identity_vertex["vertex"]:
                     identity_vertices[int(current_vertex)]["visited"] = True
                     current_vertex = self._permutation[int(current_vertex)]
-                
+                    #print(f"current_vertex = {current_vertex}")
+                    #time.sleep(0.5)
+
                 current_identity_vertex["visited"] = True
                 
                 no_cycles += 1
