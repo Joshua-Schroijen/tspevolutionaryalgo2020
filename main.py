@@ -1,4 +1,4 @@
-import r0123456
+import r0486848
 import os
 import sys
 import getopt
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     """
     parameter_vector_ea_mean_fitness = []
     for p in parameter_vector:
-      (current_mean_fitness, current_best_fitness) = r0123456.r0123456(p[0], p[1], p[2], p[3], p[4], p[5]).optimize(test_data_file)
+      (current_mean_fitness, current_best_fitness) = r0486848.r0486848(r0486848.RecombinationOperator.HGREX, p[0], p[1], p[2], p[3], p[4], p[5]).optimize(test_data_file)
       parameter_vector_ea_mean_fitness.append((p, current_mean_fitness))
 
     """
@@ -104,4 +104,4 @@ if __name__ == '__main__':
       print(p)
       
   else:
-    r0123456.r0123456(population_size_factor = population_size_factor, k = k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, mutation_chance = mutation_chance, mutation_chance_self_adaptivity = mutation_chance_self_adaptivity, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)
+    r0486848.r0486848(recombination_operator = r0486848.RecombinationOperator.HGREX, population_size_factor = population_size_factor, k = k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, mutation_chance = mutation_chance, mutation_chance_self_adaptivity = mutation_chance_self_adaptivity, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)

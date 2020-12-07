@@ -8,11 +8,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import profile_decorator
 import Reporter
+from enum import Enum
 from collections import Counter
 import pdb
 import time
 
-class r0123456:
+class r0486848:
     """
     This class implements the evolutionary algorithm - its main loop and all of its components (initialization, selection, mutation, recombination, elimination)
     """
@@ -35,7 +36,7 @@ class r0123456:
         # Return the copied permutation with the given elements swapped
         return permutation_copy
 
-    def __init__(self, population_size_factor, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
+    def __init__(self, recombination_operator, population_size_factor, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
         """
         Constructs the evolutionary algorithm object
         
@@ -47,13 +48,17 @@ class r0123456:
         :param mutation_chance_self_adaptivity: if set to True, mutation chance self-adaptivity is enabled
         :param stopping_ratio: the relative improvement in the current iteration compared to the previous one below which, after tolerances iterations, to stop optimization
         :param tolerances: the number of iterations ran below the stopping ratio before optimization is stopped
-        :return: an initialized evolutionary algorithm object of class r0123456
+        :return: an initialized evolutionary algorithm object of class r0486848
         """
         
         # Initialize and save Reporter class instance
         self.reporter = Reporter.Reporter(self.__class__.__name__)
 
         # Copy given evolutionary algorithm parameters to attributes
+        self._recombination = {
+            RecombinationOperator.PMX: self._recombination_PMX,
+            RecombinationOperator.HGREX: self._recombination_HGreX
+        }[recombination_operator]
         self._population_size_factor = population_size_factor
         self._k = k
         self._mu = mu
@@ -117,25 +122,15 @@ class r0123456:
 
             # Create μ offspring of the current population
             offspring = []
-            if self._type_recombination == 'HGreX1':
-                for _ in range(self._mu):
-                    # Select two parents
-                    first_parent = self._selection()
-                    second_parent = self._selection()
-                    # Recombine them, mutate the recombination and save the resulting offspring
-                    offspring.append(self._mutation(self._recombination(first_parent, second_parent)))
-            elif self._type_recombination == 'PMX1':
-                two_individuals = []
-                for _ in range(int(self._mu/2)):
-                    # Select two parents
-                    first_parent = self._selection()
-                    second_parent = self._selection()
-                    # Recombine them, mutate the recombination and save the resulting offspring
-                    two_individuals = self._recombinationPMX1(first_parent, second_parent)   #  PMX recombination results in two symmetric childs
-                    for ind, individual in enumerate(two_individuals):
-                        offspring.append(self._mutation(individual))
-            else:
-                pass
+            
+            while len(offspring) >= self._mu:
+                # Select two parents
+                first_parent = self._selection()
+                second_parent = self._selection()
+                # Recombine them, mutate the recombination and save the resulting offspring
+                recombinations = self._recombination(first_parent, second_parent)
+                for recombination in recombinations:
+                    offspring.append(self._mutation(recombination)) 
 
             # Apply random mutation to each member of the population
             for idx, individual in enumerate(self._population):
@@ -191,7 +186,7 @@ class r0123456:
         report += " than best heuristic solution fitness"
         print(report)
 
-        # Generate plots of the mean and best fitnesses as the iterations progress and save them to r0123456_means.png and r0123456_bests.png respectively
+        # Generate plots of the mean and best fitnesses as the iterations progress and save them to r0486848_means.png and r0486848_bests.png respectively
         plt.figure()
         plt.plot(iteration_numbers, mean_fitnesses, label="Mean fitness")
         plt.hlines(nn_mean_fitness, 0, len(iteration_numbers) - 1, label="Mean heuristic fitness", colors="r")
@@ -204,7 +199,7 @@ class r0123456:
         upper_y_bound = max(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 1.2
         plt.ylim([lower_y_bound, upper_y_bound])
         plt.xticks(range(0, len(iteration_numbers) , 1))
-        plt.savefig('r0123456_means.png')
+        plt.savefig('r0486848_means.png')
         plt.figure()
         plt.plot(iteration_numbers, best_fitnesses, label="Best fitness")
         plt.hlines(nn_best_fitness, 0, len(iteration_numbers) - 1, label="Best heuristic fitness", colors="r")
@@ -217,7 +212,7 @@ class r0123456:
         upper_y_bound = max(itertools.chain(best_fitnesses, [nn_best_fitness])) * 1.2
         plt.ylim([lower_y_bound, upper_y_bound])
         plt.xticks(range(0, len(iteration_numbers), 1))
-        plt.savefig('r0123456_bests.png')
+        plt.savefig('r0486848_bests.png')
 
         # Plot the evolution of the standard deviation of the Hamming distances to the identity permutations
         plt.figure()
@@ -229,18 +224,18 @@ class r0123456:
         plt.xlim([0, len(iteration_numbers) - 1])
         plt.ylim([0, self._tsp.no_vertices - 1])
         plt.xticks(range(0, len(iteration_numbers), 1))
-        plt.savefig('r0123456_stdev_distances.png')
+        plt.savefig('r0486848_stdev_distances.png')
         
-        # Plot the final population distribution and save it to r0123456_last_distribution.png
+        # Plot the final population distribution and save it to r0486848_last_distribution.png
         plt.figure()
         plt.bar(range(self._tsp.no_vertices), self._population.get_distribution())
         plt.title('Distribution of individuals')
         plt.xlabel('Distance to identity permutation')
         plt.ylabel('# individuals')
-        plt.savefig('r0123456_last_distribution.png')
+        plt.savefig('r0486848_last_distribution.png')
 
-        # Write the last population's contents to r0123456_last_population.txt        
-        self._population.write_to_file("r0123456_last_population.txt")
+        # Write the last population's contents to r0486848_last_population.txt        
+        self._population.write_to_file("r0486848_last_population.txt")
 
         # Return performance results of the optimization
         return (current_mean_fitness, current_best_fitness)
@@ -310,7 +305,7 @@ class r0123456:
         # Return said individual
         return selected[i]
 
-    def _recombination(self, first_parent, second_parent):
+    def _recombination_HGreX(self, first_parent, second_parent):
         """
         Performs a HGreX recombination on the two given Individual objects
     
@@ -378,9 +373,42 @@ class r0123456:
         else:
           child_mutation_chance = self._mutation_chance
         # Return a new Individual object based on the recombined child permutation and mutation chance
-        return Individual(np.array(child_permutation), child_mutation_chance)
+        return [Individual(np.array(child_permutation), child_mutation_chance)]
         
-    def _recombinationPMX1(self,first_parent,second_parent):
+    def _recombination_PMX(self, first_parent, second_parent):
+        def PMX_core_logic(self):
+            child_permutation = [None] * self._tsp.no_vertices   # child permutation will be a list of integers (not numpy list)
+            # Copy the segment of parent 1 into the offspring
+            child_permutation[index_begin:index_end + 1] = first_parent.permutation[index_begin:index_end + 1]
+            covered_area = [*range(index_begin, index_end + 1)]   # keep track of what is already covered in child_permutation
+            # loop over the elements of parent 2 at the segment locations
+            for idx in range(index_begin,index_end+1):
+                if second_parent.permutation[idx] in first_parent.permutation[index_begin:index_end + 1]:
+                    pass   # this value has already found a place in the new child.
+                else:
+                    idx_search = idx
+                    location_found = False
+                    while not location_found:
+                        idx_found = np.where(second_parent.permutation == child_permutation[idx_search])[0][0]
+                        if child_permutation[idx_found] != None:    # found location in offspring is already occupied
+                            idx_search = idx_found   # set index to be able to look for the new found value.
+                        else:
+                            location_found = True
+                            covered_area.append(idx_found)
+                    child_permutation[idx_found] = second_parent.permutation[idx]  # assign the new location of this value.
+            # Determine which are the remaining elements of parent 2 to be copied to the offspring.
+            idx_to_be_copied = list(set([*range(0, self._tsp.no_vertices)]) - set(covered_area))  # full list minus covered area
+            # copy the remaining elements into the child.
+            for ind in idx_to_be_copied:
+                child_permutation[ind] = second_parent.permutation[ind]
+
+            # Recombine the child's mutation chance with a blend recombination if self-adaptivity is enabled
+            if self._mutation_chance_self_adaptivity:
+                child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
+            else:
+                child_mutation_chance = self._mutation_chance
+            return Individual(np.array(child_permutation), child_mutation_chance)
+
         # Choose a random index vertex
         index_vertex1 = np.random.randint(self._tsp.no_vertices)
         # Choose another random index vertex
@@ -389,46 +417,13 @@ class r0123456:
         while index_vertex1 == index_vertex2:
             index_vertex2 = np.random.randint(self._tsp.no_vertices) # Choose another random index vertex
         # begin index has to be the smallest value, so sort the indices
-        index_begin, index_end = np.sort(np.array([index_vertex1,index_vertex2]))
+        index_begin, index_end = np.sort(np.array([index_vertex1, index_vertex2]))
         # ##### check if the same index, then decide what to do... #####
         ############################
         # determine first and second child respectively, which are kind of symmetric
-        child1 = self._PMXimplementation(first_parent,second_parent,index_begin,index_end)
-        child2 = self._PMXimplementation(second_parent, first_parent, index_begin, index_end)
-        return [child1,child2]
-
-    def _PMXimplementation(self,first_parent,second_parent,index_begin,index_end):
-        child_permutation = [None]*self._tsp.no_vertices   # child permutation will be a list of integers (not numpy list)
-        # Copy the segment of parent 1 into the offspring
-        child_permutation[index_begin:index_end+1] = first_parent.permutation[index_begin:index_end+1]
-        covered_area = [*range(index_begin,index_end+1)]   # keep track of what is already covered in child_permutation
-        # loop over the elements of parent 2 at the segment locations
-        for idx in range(index_begin,index_end+1):
-            if second_parent.permutation[idx] in first_parent.permutation[index_begin:index_end+1]:
-                pass   # this value has already found a place in the new child.
-            else:
-                idx_search = idx
-                location_found = False
-                while not location_found:
-                    idx_found = np.where(second_parent.permutation == child_permutation[idx_search])[0][0]
-                    if child_permutation[idx_found] != None:    # found location in offspring is already occupied
-                        idx_search = idx_found   # set index to be able to look for the new found value.
-                    else:
-                        location_found = True
-                        covered_area.append(idx_found)
-                child_permutation[idx_found] = second_parent.permutation[idx]  # assign the new location of this value.
-        # Determine which are the remaining elements of parent 2 to be copied to the offspring.
-        idx_to_be_copied = list(set([*range(0,self._tsp.no_vertices)]) - set(covered_area))  # full list minus covered area
-        # copy the remaining elements into the child.
-        for ind in idx_to_be_copied:
-            child_permutation[ind] = second_parent.permutation[ind]
-
-        # Recombine the child's mutation chance with a blend recombination if self-adaptivity is enabled
-        if self._mutation_chance_self_adaptivity:
-          child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
-        else:
-          child_mutation_chance = self._mutation_chance
-        return Individual(np.array(child_permutation), child_mutation_chance)
+        child1 = PMX_core_logic()
+        child2 = PMX_core_logic()
+        return [child1, child2]
 
     def _mutation(self, individual):
         """
@@ -517,6 +512,10 @@ class r0123456:
                 next_vertex = np.argmin(edge_weights)
         
         return Individual(nn_solution, self._mutation_chance)
+
+class RecombinationOperator(Enum):
+    PMX = 1
+    HGREX = 2
 
 class TSP:
     """
