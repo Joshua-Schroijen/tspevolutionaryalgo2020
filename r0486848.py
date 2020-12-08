@@ -67,7 +67,6 @@ class r0486848:
         self._mutation_chance_self_adaptivity = mutation_chance_self_adaptivity
         self._stopping_ratio = stopping_ratio
         self._tolerances = tolerances
-        # print(population_size_factor, k, mu, no_individuals_to_keep, stopping_ratio, tolerances)
         # Initialize remaining attributes
         self._population = None
         self._tsp = None
@@ -592,6 +591,31 @@ class TSP:
         return self._distance_matrix.shape[0]
 
 class Individual:
+    @staticmethod
+    def _distance_to_identity(permutation):
+        """
+        Returns the number of swaps needed to transform the identity permutation into the given permutation
+        
+        :return: the number of swaps needed to transform the identity permutation into the given permutation
+        """
+        # The key idea of this implementation is the fact that the number of swaps required to transform the identity
+        # permutation into a given permutation is equal to the length of the permutation - its number of cycles
+        no_cycles = 0
+        identity_vertices = [{ "vertex": vertex, "visited": False } for vertex in range(np.size(permutation))]
+        for current_identity_vertex in identity_vertices:
+            if current_identity_vertex["visited"] == False:
+                # Count the cycles
+                current_vertex = permutation[current_identity_vertex["vertex"]]
+                while current_vertex != current_identity_vertex["vertex"]:
+                    identity_vertices[int(current_vertex)]["visited"] = True
+                    current_vertex = permutation[int(current_vertex)]
+
+                current_identity_vertex["visited"] = True
+                
+                no_cycles += 1
+        
+        return np.size(permutation) - no_cycles
+
     """
     This class represents an individual based on a permutation stored in a 1D Numpy array
 
@@ -609,26 +633,7 @@ class Individual:
         
         :return: the number of swaps needed to transform the identity permutation into the individual's permutation
         """
-        # The key idea of this implementation is the fact that the number of swaps required to transform the identity
-        # permutation into a given permutation is equal to the length of the permutation - its number of cycles
-        no_cycles = 0
-        identity_vertices = [{ "vertex": vertex, "visited": False } for vertex in range(np.size(self._permutation))]
-        for current_identity_vertex in identity_vertices:
-            # print(f'starting loop at {current_identity_vertex["vertex"]}')
-            if current_identity_vertex["visited"] == False:
-                # Count the cycles
-                current_vertex = self._permutation[current_identity_vertex["vertex"]]
-                while current_vertex != current_identity_vertex["vertex"]:
-                    identity_vertices[int(current_vertex)]["visited"] = True
-                    current_vertex = self._permutation[int(current_vertex)]
-                    #print(f"current_vertex = {current_vertex}")
-                    #time.sleep(0.5)
-
-                current_identity_vertex["visited"] = True
-                
-                no_cycles += 1
-        
-        return np.size(self._permutation) - no_cycles
+        return self._distance_to_identity(self._permutation)
 
     @property
     def permutation(self):
