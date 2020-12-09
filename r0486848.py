@@ -598,6 +598,15 @@ class Individual:
         
         :return: the number of swaps needed to transform the identity permutation into the given permutation
         """
+        return np.size(permutation) - Individual._no_cycles(permutation)
+
+    @staticmethod
+    def _no_cycles(permutation):
+        """
+        Returns the number of cycles in the given permutation
+        
+        :return: the number of cycles in the given permutation
+        """
         # The key idea of this implementation is the fact that the number of swaps required to transform the identity
         # permutation into a given permutation is equal to the length of the permutation - its number of cycles
         no_cycles = 0
@@ -614,7 +623,7 @@ class Individual:
                 
                 no_cycles += 1
         
-        return np.size(permutation) - no_cycles
+        return no_cycles
 
     """
     This class represents an individual based on a permutation stored in a 1D Numpy array
@@ -622,7 +631,6 @@ class Individual:
     :attribute permutation: a 1D Numpy array containing integers representing the permutation
     :attribute mutation_chance: the chance that this individual will mutate
     """
-
     def __init__(self, permutation, mutation_chance = 0.05):
         self._permutation = permutation
         self._mutation_chance = mutation_chance                                                                                     # 
@@ -634,6 +642,27 @@ class Individual:
         :return: the number of swaps needed to transform the identity permutation into the individual's permutation
         """
         return self._distance_to_identity(self._permutation)
+
+    def distance_to_other(other_permutation):
+        def compose(first, second):
+            n = np.size(first, 0)
+            composed = np.zeros(n)
+
+            for i in range(n):
+                composed[i] = second[int(first[i])]
+
+            return composed
+
+        def inverse(permutation):
+            n = np.size(permutation, 0)
+            inverse_permutation = np.zeros(n)
+
+            for i in range(n):
+                inverse_permutation[int(permutation[i])] = i
+
+            return inverse_permutation
+            
+        return self._no_cycles(compose(inverse(other_permutation), self._permutation))
 
     @property
     def permutation(self):
