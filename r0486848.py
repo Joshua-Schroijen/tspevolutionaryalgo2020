@@ -122,7 +122,7 @@ class r0486848:
             # Create μ offspring of the current population
             offspring = []
             
-            while len(offspring) >= self._mu:
+            while len(offspring) < self._mu:
                 # Select two parents
                 first_parent = self._selection()
                 second_parent = self._selection()
@@ -375,7 +375,7 @@ class r0486848:
         return [Individual(np.array(child_permutation), child_mutation_chance)]
         
     def _recombination_PMX(self, first_parent, second_parent):
-        def PMX_core_logic(self):
+        def PMX_core_logic():
             child_permutation = [None] * self._tsp.no_vertices   # child permutation will be a list of integers (not numpy list)
             # Copy the segment of parent 1 into the offspring
             child_permutation[index_begin:index_end + 1] = first_parent.permutation[index_begin:index_end + 1]
