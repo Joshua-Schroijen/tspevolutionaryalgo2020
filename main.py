@@ -104,4 +104,4 @@ if __name__ == '__main__':
       print(p)
       
   else:
-    r0486848.r0486848(recombination_operator = r0486848.RecombinationOperator.HGREX, population_size_factor = population_size_factor, k = k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, mutation_chance = mutation_chance, mutation_chance_self_adaptivity = mutation_chance_self_adaptivity, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)
+    r0486848.r0486848(recombination_operator = r0486848.RecombinationOperator.HGREX, elimination_scheme = r0486848.EliminationScheme.LAMBDAPLUSMU_WCROWDING, population_size_factor = population_size_factor, k = k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, mutation_chance = mutation_chance, mutation_chance_self_adaptivity = mutation_chance_self_adaptivity, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)

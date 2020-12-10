@@ -36,7 +36,7 @@ class r0486848:
         # Return the copied permutation with the given elements swapped
         return permutation_copy
 
-    def __init__(self, recombination_operator, population_size_factor, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
+    def __init__(self, recombination_operator, elimination_scheme, population_size_factor, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
         """
         Constructs the evolutionary algorithm object
         
@@ -59,6 +59,10 @@ class r0486848:
             RecombinationOperator.PMX: self._recombination_PMX,
             RecombinationOperator.HGREX: self._recombination_HGreX
         }[recombination_operator]
+        self._elimination = {
+            EliminationScheme.LAMBDAPLUSMU: self._elimination_lambdaplusmu,
+            EliminationScheme.LAMBDAPLUSMU_WCROWDING: self._elimination_lambdaplusmu_with_crowding
+        }[elimination_scheme]
         self._population_size_factor = population_size_factor
         self._k = k
         self._mu = mu
@@ -442,8 +446,8 @@ class r0486848:
         else:
             # The mutation should not happen here, return a copy of the original Individual
             return Individual(individual.permutation, individual.mutation_chance)
-      
-    def _elimination(self, offspring):
+
+    def _elimination_lambdaplusmu(self, offspring):
         """
         Performs (λ + μ)-elimination on the current population extended with the given offspring
     
@@ -462,6 +466,32 @@ class r0486848:
         # Return the individuals at those indices
         return list(combined[selected])
 
+    def _elimination_lambdaplusmu_with_crowding(self, offspring):
+        """
+        Performs (λ + μ)-elimination on the current population extended with the given offspring
+    
+        :param offspring: a Python list of Individual objects representing the newly created offspring
+        :return: a Python list of Individual objects representing a new, (λ + μ)-eliminated population
+        """
+        k = 3
+        
+        selected = []
+
+        # Create the combined collection of the current population and given offspring
+        combined = []
+        combined.extend(self._population.individuals)
+        combined.extend(offspring)
+        
+        for _ in range(self._no_individuals_to_keep):
+            currently_selected_individual = np.argmin([self._tsp.fitness(individual) for individual in combined])
+            selected.append(combined[currently_selected_individual])
+            random_others = np.random.choice([*range(currently_selected_individual), *range(currently_selected_individual + 1, len(combined))], k)
+            individual_to_delete = random_others[np.argmin([combined[other].distance_to_other(combined[currently_selected_individual]) for other in random_others])]
+            del combined[max(currently_selected_individual, individual_to_delete)]
+            del combined[min(currently_selected_individual, individual_to_delete)]
+
+        return list(selected)
+        
     def __get_nearest_neighbour_solution(self, starting_vertex):
         """
         Returns an Individual object representing the solution constructed starting from a certain vertex with the nearest neighbour heuristic
@@ -513,8 +543,12 @@ class r0486848:
         return Individual(nn_solution, self._mutation_chance)
 
 class RecombinationOperator(Enum):
-    PMX = 1
+    PMX   = 1
     HGREX = 2
+
+class EliminationScheme(Enum):
+    LAMBDAPLUSMU           = 1
+    LAMBDAPLUSMU_WCROWDING = 2
 
 class TSP:
     """
@@ -643,7 +677,7 @@ class Individual:
         """
         return self._distance_to_identity(self._permutation)
 
-    def distance_to_other(other_permutation):
+    def distance_to_other(self, other):
         def compose(first, second):
             n = np.size(first, 0)
             composed = np.zeros(n)
@@ -662,7 +696,7 @@ class Individual:
 
             return inverse_permutation
             
-        return self._no_cycles(compose(inverse(other_permutation), self._permutation))
+        return self._no_cycles(compose(inverse(other.permutation), self._permutation))
 
     @property
     def permutation(self):
