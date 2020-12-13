@@ -7,14 +7,18 @@ def takeMeanfitness(elem):
   return elem[1]
 
 if __name__ == '__main__':
-  os.system('clear')
+  if os.name == 'nt':
+    os.system('cls')
+  else:
+    os.system('clear')
 
   test_data_file = ''
   optimize_hyperparameters = False
-  population_size_factor = 6
+  no_islands = 29
+  population_size_factor = 100
   k = 5
-  mu = 110
-  no_individuals_to_keep = 110
+  mu = 100
+  no_individuals_to_keep = 100
   mutation_chance = 0.05
   mutation_chance_self_adaptivity = False
   stopping_ratio = 0.001
@@ -104,4 +108,4 @@ if __name__ == '__main__':
       print(p)
       
   else:
-    r0486848.r0486848(recombination_operator = r0486848.RecombinationOperator.HGREX, elimination_scheme = r0486848.EliminationScheme.LAMBDAPLUSMU_WCROWDING, population_size_factor = population_size_factor, k = k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, mutation_chance = mutation_chance, mutation_chance_self_adaptivity = mutation_chance_self_adaptivity, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)
+    r0486848.r0486848(population_generation_scheme = r0486848.PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED, recombination_operator = r0486848.RecombinationOperator.HGREX, elimination_scheme = r0486848.EliminationScheme.LAMBDAPLUSMU, no_islands = no_islands, population_size_factor = population_size_factor, k = k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, mutation_chance = mutation_chance, mutation_chance_self_adaptivity = mutation_chance_self_adaptivity, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)

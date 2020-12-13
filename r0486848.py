@@ -4,42 +4,54 @@ import collections
 import itertools
 import timeit
 import sys
+import concurrent.futures
 import numpy as np
 import matplotlib.pyplot as plt
 import profile_decorator
 import Reporter
 from enum import Enum
-from collections import Counter
-import pdb
-import time
+
+def _get_swapped(permutation, a, b):
+    """
+    Swaps the elements at indices a and b of the given permutation
+
+    :param permutation: a 1D-Numpy array representing the permutation we want to apply a swap to
+    :param a: first index of elements to swap
+    :param b: second index of elements to swap
+    :return: a new permutation based on the given one with the elements at indices a and b swapped
+    """
+        
+    # Create a copy of the permutation
+    permutation_copy = np.copy(permutation)
+    # Use Numpy's indexing-with-a-list feature to easily swap the elements in the copied permutation
+    permutation_copy[[b, a]] = permutation_copy[[a, b]]
+    # Return the copied permutation with the given elements swapped
+    return permutation_copy
+
+class PopulationGenerationScheme(Enum):
+    RANDOM                  = 1
+    NEAREST_NEIGHBOUR_BASED = 2
+
+class RecombinationOperator(Enum):
+    PMX   = 1
+    HGREX = 2
+
+class EliminationScheme(Enum):
+    LAMBDAPLUSMU           = 1
+    LAMBDAPLUSMU_WCROWDING = 2
 
 class r0486848:
     """
-    This class implements the evolutionary algorithm - its main loop and all of its components (initialization, selection, mutation, recombination, elimination)
-    """
-
-    @staticmethod
-    def __get_swapped(permutation, a, b):
+    This class manages the solving of a TSP with r0486848's evolutionary algorithm
+    """ 
+    def __init__(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, population_size_factor, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
         """
-        Swaps the elements at indices a and b of the given permutation
-
-        :param permutation: a 1D-Numpy array representing the permutation we want to apply a swap to
-        :param a: first index of elements to swap
-        :param b: second index of elements to swap
-        :return: a new permutation based on the given one with the elements at indices a and b swapped
-        """
+        Constructs the r0486848 TSP solver object with certain parameters that will be used for running the evolutionary algorithm
         
-        # Create a copy of the permutation
-        permutation_copy = np.copy(permutation)
-        # Use Numpy's indexing-with-a-list feature to easily swap the elements in the copied permutation
-        permutation_copy[[b, a]] = permutation_copy[[a, b]]
-        # Return the copied permutation with the given elements swapped
-        return permutation_copy
-
-    def __init__(self, recombination_operator, elimination_scheme, population_size_factor, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
-        """
-        Constructs the evolutionary algorithm object
-        
+        :param population_generation_scheme: the population generation scheme
+        :param reombination_operator: the recombination operator to use
+        :param elimination_scheme: the elimination scheme
+        :param no_islands: the number of islands to use (this evolutionary algorithm uses the island model)
         :param population_size_factor: population size is number of vertices in problem * this parameter
         :param k: tournament size for k-tournament selection
         :param mu: number of offspring to generate from the population
@@ -55,14 +67,13 @@ class r0486848:
         self.reporter = Reporter.Reporter(self.__class__.__name__)
 
         # Copy given evolutionary algorithm parameters to attributes
-        self._recombination = {
-            RecombinationOperator.PMX: self._recombination_PMX,
-            RecombinationOperator.HGREX: self._recombination_HGreX
-        }[recombination_operator]
-        self._elimination = {
-            EliminationScheme.LAMBDAPLUSMU: self._elimination_lambdaplusmu,
-            EliminationScheme.LAMBDAPLUSMU_WCROWDING: self._elimination_lambdaplusmu_with_crowding
-        }[elimination_scheme]
+        self._get_initial_population = {
+            PopulationGenerationScheme.RANDOM: self._get_random_initial_population,
+            PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: self._get_nearest_neighbour_based_initial_population
+        }[population_generation_scheme]
+        self._recombination_operator = recombination_operator
+        self._elimination_scheme = elimination_scheme
+        self._no_islands = no_islands
         self._population_size_factor = population_size_factor
         self._k = k
         self._mu = mu
@@ -71,21 +82,11 @@ class r0486848:
         self._mutation_chance_self_adaptivity = mutation_chance_self_adaptivity
         self._stopping_ratio = stopping_ratio
         self._tolerances = tolerances
-        # Initialize remaining attributes
-        self._population = None
+
         self._tsp = None
-        self._population_size = math.nan
-        self._type_recombination = 'PMX1'   # PMX1 or  HGreX1
-        
+    
     @profile_decorator.profile("algorithm_profile.txt")
-    def optimize(self, filename):
-        """
-        Runs the evolutionary algorithm and reports its' results
-        
-        :param filename: a string containing the filename of a CSV-file containing the TSP instance
-        :return: a tuple with the mean and best fitness of the last population
-        """
-        
+    def optimize(self, filename):   
         print("Starting evolutionary algorithm ...")
         # Start timer for assessing optimization speed
         start_time = timeit.default_timer()
@@ -104,76 +105,47 @@ class r0486848:
         print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness:.5f}\n\tBest heuristic fitness = {nn_best_fitness:.5f}")
         
         # Initialize the population
-        self._initialize_population()
-
-        # Set up main loop variables
-        current_mean_fitness = self._tsp.mean_fitness(self._population.individuals, True)
-        current_best_fitness = self._tsp.best_fitness(self._population.individuals)
+        complete_initial_population = self._get_initial_population()
+        initial_subpopulations = complete_initial_population.get_subpopulations(self._no_islands, False)
+        
+        # Run evolutionary algorith on islands, keeping track of performance
         iteration_number = 0
         iteration_numbers = [iteration_number]
+        current_mean_fitness = self._tsp.mean_fitness(complete_initial_population.individuals, True)
+        current_best_fitness = self._tsp.best_fitness(complete_initial_population.individuals)
         mean_fitnesses = [current_mean_fitness]
         best_fitnesses = [current_best_fitness]
-        current_change = math.nan
-        change_ratio = float('inf')
-        change_ratios = FixedSizeStack(self._tolerances)
-        change_ratios.push(change_ratio)
-        stdev_hamming_distances = [self._population.get_stdev_distance_to_identity()]
-        print("Entering main loop")
-        while( any([cr > self._stopping_ratio for cr in change_ratios]) ): # Keep optimizing while change ratio is large enough
-            previous_mean_fitness = current_mean_fitness
-            previous_best_fitness = current_best_fitness
-
-            # Create μ offspring of the current population
-            offspring = []
-            
-            while len(offspring) < self._mu:
-                # Select two parents
-                first_parent = self._selection()
-                second_parent = self._selection()
-                # Recombine them, mutate the recombination and save the resulting offspring
-                recombinations = self._recombination(first_parent, second_parent)
-                for recombination in recombinations:
-                    offspring.append(self._mutation(recombination)) 
-
-            # Apply random mutation to each member of the population
-            for idx, individual in enumerate(self._population):
-                self._population.individuals[idx] = self._mutation(individual)
-
-            # Apply elimination to the current population and its offspring, forming the new population
-            self._population = Population(self._elimination(offspring), self._tsp.no_vertices)
-
-            # Determine change ratio
-            current_mean_fitness = self._tsp.mean_fitness(self._population.individuals, True)
-            current_best_fitness = self._tsp.best_fitness(self._population.individuals)
-
-            iteration_number += 1
-            iteration_numbers.append(iteration_number)
-            mean_fitnesses.append(current_mean_fitness)
-            best_fitnesses.append(current_best_fitness)
-
-            previous_change = current_change
-            current_change = previous_mean_fitness - current_mean_fitness
-            if math.isnan(previous_change):
-                change_ratio = float('inf')
-            else:
-                change_ratio = abs(current_change) / (abs(previous_change) + sys.float_info.epsilon)
-            change_ratios.push(change_ratio)
-
-            stdev_hamming_distances.append(self._population.get_stdev_distance_to_identity())
-
-            # Call the reporter with:
-            #  - the mean objective function value of the population
-            #  - the best objective function value of the population
-            #  - a 1D numpy array in the cycle notation containing the best solution 
-            #    with city numbering starting from 0
-            timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, self._tsp.best_individual(self._population.individuals).permutation)
-            # Report iteration results
-            print(f"Iteration complete. Change ratio = {change_ratio:.5f}, time left = {timeLeft:.3f} seconds")
-            print(f"\tCurrent mean fitness = {current_mean_fitness:.5f}, current best fitness = {current_best_fitness:.5f}")
-            # Stop optimizing if out of time
-            if timeLeft < 0:
-                break
-
+        stdev_hamming_distances = [complete_initial_population.get_stdev_distance_to_identity()]
+        
+        evolutionary_algorithms = [self.__get_EA(subpopulation) for subpopulation in initial_subpopulations]
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            while(any([not ea.converged for ea in evolutionary_algorithms])):
+                current_subpopulation_futures = [executor.submit(ea.run_iteration) for ea in evolutionary_algorithms]
+                
+                current_population = Population([individual for current_subpopulation_future in current_subpopulation_futures for individual in current_subpopulation_future.result()], self._tsp.no_vertices)
+                
+                current_mean_fitness = self._tsp.mean_fitness(current_population.individuals, True)
+                current_best_fitness = self._tsp.best_fitness(current_population.individuals)
+                no_converged_algorithms = sum(1 for ea in evolutionary_algorithms if ea.converged)
+                iteration_number += 1
+                iteration_numbers.append(iteration_number)
+                mean_fitnesses.append(current_mean_fitness)
+                best_fitnesses.append(current_best_fitness)
+                stdev_hamming_distances.append(current_population.get_stdev_distance_to_identity())
+               
+                # Call the reporter with:
+                #  - the mean objective function value of the population
+                #  - the best objective function value of the population
+                #  - a 1D numpy array in the cycle notation containing the best solution 
+                #    with city numbering starting from 0
+                timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, self._tsp.best_individual(current_population.individuals).permutation)
+                # Report iteration results
+                print(f"Iteration complete. {no_converged_algorithms} out of {len(evolutionary_algorithms)} islands converged, time left = {timeLeft:.3f} seconds")
+                print(f"\tCurrent mean fitness = {current_mean_fitness:.5f}, current best fitness = {current_best_fitness:.5f}")
+                # Stop optimizing if out of time
+                if timeLeft < 0:
+                    break
+        
         # Report optimization speed to screen
         elapsed = timeit.default_timer() - start_time
         print(f"Evolutionary algorithm finished in {elapsed:.3f} seconds")
@@ -188,7 +160,7 @@ class r0486848:
         report += "better" if last_best_performance_difference_with_heuristic >= 0 else "worse"
         report += " than best heuristic solution fitness"
         print(report)
-
+                
         # Generate plots of the mean and best fitnesses as the iterations progress and save them to r0486848_means.png and r0486848_bests.png respectively
         plt.figure()
         plt.plot(iteration_numbers, mean_fitnesses, label="Mean fitness")
@@ -231,17 +203,17 @@ class r0486848:
         
         # Plot the final population distribution and save it to r0486848_last_distribution.png
         plt.figure()
-        plt.bar(range(self._tsp.no_vertices), self._population.get_distribution())
+        plt.bar(range(self._tsp.no_vertices), current_population.get_distribution())
         plt.title('Distribution of individuals')
         plt.xlabel('Distance to identity permutation')
         plt.ylabel('# individuals')
         plt.savefig('r0486848_last_distribution.png')
 
         # Write the last population's contents to r0486848_last_population.txt        
-        self._population.write_to_file("r0486848_last_population.txt")
+        current_population.write_to_file("r0486848_last_population.txt")
 
         # Return performance results of the optimization
-        return (current_mean_fitness, current_best_fitness)
+        return (current_mean_fitness, current_best_fitness)    
 
     def _get_benchmarks(self):
         """
@@ -260,12 +232,16 @@ class r0486848:
         # Return the mean and best fitness of the set of nearest neighbour solutions at each possible starting vertex
         return (self._tsp.mean_fitness(nn_individuals, True), self._tsp.best_fitness(nn_individuals))
 
-    def _initialize_population(self):
+    def _get_random_initial_population(self):
+        pass
+
+    def _get_nearest_neighbour_based_initial_population(self):
         """
-        Initializes the population by taking the set of nearest neighbour solutions starting at each possible vertex and
+        Creates a population by taking the set of nearest neighbour solutions starting at each possible vertex and
         extending it with (population_size_factor - 1) randomly swap mutated versions of each member
-        """
         
+        :return: a Population object containing the generated initial population
+        """
         starting_individuals = []
         
         # Add the set of nearest neighbour solutions starting at each possible vertex
@@ -284,13 +260,155 @@ class r0486848:
                 for _ in range(no_random_swaps):
                     a = np.random.randint(0, self._tsp.no_vertices)
                     b = np.random.randint(0, self._tsp.no_vertices)
-                    permutation = self.__get_swapped(permutation, a, b)
+                    permutation = _get_swapped(permutation, a, b)
                 
                 # Add the new, mutated version of the current member to the population
                 starting_individuals.append(Individual(permutation, self._mutation_chance))
 
-        # Set the population attribute to the initial population generated in this method
-        self._population = Population(starting_individuals, self._tsp.no_vertices)
+        # Return the generated initial population
+        return(Population(starting_individuals, self._tsp.no_vertices))
+
+    def __get_EA(self, population):
+        return EvolutionaryAlgorithm(self._tsp, self._recombination_operator, self._elimination_scheme, self._k, self._mu, self._no_individuals_to_keep, self._mutation_chance, self._mutation_chance_self_adaptivity, self._stopping_ratio, self._tolerances, population)
+
+    def __get_nearest_neighbour_solution(self, starting_vertex):
+        """
+        Returns an Individual object representing the solution constructed starting from a certain vertex with the nearest neighbour heuristic
+        (https://en.wikipedia.org/wiki/Nearest_neighbour_algorithm)
+    
+        :param starting_vertex: integer representing the starting vertex
+        :return: Individual object representing nearest neighbour solution starting at starting_vertex
+        """
+
+        nn_solution = np.empty(self._tsp.no_vertices)
+        visited = []
+
+        # Start at starting_vertex
+        current_vertex = starting_vertex
+        # Mark starting_vertex as visited
+        visited.append(current_vertex)
+        # Record starting_vertex in solution
+        nn_solution[0] = current_vertex
+        # Select next vertex as closest unvisited one
+        edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
+        edge_weights[visited] = np.Inf
+        
+        if np.isinf(np.min(edge_weights)):
+            for v in range(np.size(edge_weights)):
+                 if v not in visited:
+                     next_vertex = v
+                     break
+        else:
+            next_vertex = np.argmin(edge_weights)
+        # Traverse the remaining vertices
+        for i in range(1, self._tsp.no_vertices):
+            # Go to the next vertex
+            current_vertex = next_vertex
+            # Mark next vertex as visited
+            visited.append(current_vertex)
+            # Record next vertex in solution
+            nn_solution[i] = current_vertex
+            # Select next vertex as closest unvisited one
+            edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
+            edge_weights[visited] = np.Inf
+            if np.isinf(np.min(edge_weights)):
+                for v in range(np.size(edge_weights)):
+                    if v not in visited:
+                        next_vertex = v
+                        break
+            else:
+                next_vertex = np.argmin(edge_weights)
+        
+        return Individual(nn_solution, self._mutation_chance)
+
+class EvolutionaryAlgorithm:
+    """
+    This class implements the evolutionary algorithm - its main loop and all of its components (initialization, selection, mutation, recombination, elimination)
+    """
+    def __init__(self, tsp, recombination_operator, elimination_scheme, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances, population):
+        """
+        Constructs the evolutionary algorithm object
+        
+        :param reombination_operator: the recombination operator to use
+        :param elimination_scheme: the elimination scheme
+        :param k: tournament size for k-tournament selection
+        :param mu: number of offspring to generate from the population
+        :param no_individuals_to_keep: number of individuals to keep in elimination steps
+        :param mutation_chance: number between 0 and 1 representing the chance of mutation
+        :param mutation_chance_self_adaptivity: if set to True, mutation chance self-adaptivity is enabled
+        :param stopping_ratio: the relative improvement in the current iteration compared to the previous one below which, after tolerances iterations, to stop optimization
+        :param tolerances: the number of iterations ran below the stopping ratio before optimization is stopped
+        :return: an initialized evolutionary algorithm object of class r0486848
+        """
+        # Copy given evolutionary algorithm arguments to attributes
+        self._tsp = tsp
+        self._recombination = {
+            RecombinationOperator.PMX: self._recombination_PMX,
+            RecombinationOperator.HGREX: self._recombination_HGreX
+        }[recombination_operator]
+        self._elimination = {
+            EliminationScheme.LAMBDAPLUSMU: self._elimination_lambdaplusmu,
+            EliminationScheme.LAMBDAPLUSMU_WCROWDING: self._elimination_lambdaplusmu_with_crowding
+        }[elimination_scheme]
+        self._k = k
+        self._mu = mu
+        self._no_individuals_to_keep = no_individuals_to_keep
+        self._mutation_chance = mutation_chance
+        self._mutation_chance_self_adaptivity = mutation_chance_self_adaptivity
+        self._stopping_ratio = stopping_ratio
+        self._tolerances = tolerances
+        self._population = population
+        
+        # Set up convergence tracking
+        self._current_mean_fitness = self._tsp.mean_fitness(self._population.individuals, True)
+        self._current_change = math.nan
+        self._change_ratio = float('inf')
+        self._change_ratios = FixedSizeStack(self._tolerances)
+        self._change_ratios.push(self._change_ratio)
+        
+        self._converged = False
+        
+    def run_iteration(self):
+        """
+        Runs one iteration of the evolutionary algorithm
+        
+        :return: the population after the iteration of the evolutionary algorithm
+        """       
+        self._previous_mean_fitness = self._current_mean_fitness
+
+        # Create μ offspring of the current population
+        offspring = []
+            
+        while len(offspring) < self._mu:
+            # Select two parents
+            first_parent = self._selection()
+            second_parent = self._selection()
+            # Recombine them, mutate the recombination and save the resulting offspring
+            recombinations = self._recombination(first_parent, second_parent)
+            for recombination in recombinations:
+                offspring.append(self._mutation(recombination)) 
+
+        # Apply random mutation to each member of the population
+        for idx, individual in enumerate(self._population):
+            self._population.individuals[idx] = self._mutation(individual)
+
+        # Apply elimination to the current population and its offspring, forming the new population
+        self._population = Population(self._elimination(offspring), self._tsp.no_vertices)
+
+        # Determine change ratio
+        self._current_mean_fitness = self._tsp.mean_fitness(self._population.individuals, True)
+
+        self._previous_change = self._current_change
+        self._current_change = self._previous_mean_fitness - self._current_mean_fitness
+        if math.isnan(self._previous_change):
+            self._change_ratio = float('inf')
+        else:
+            self._change_ratio = abs(self._current_change) / (abs(self._previous_change) + sys.float_info.epsilon)
+        self._change_ratios.push(self._change_ratio)
+
+        self._converged = not any([cr > self._stopping_ratio for cr in self._change_ratios])
+
+        return self._population
 
     def _selection(self):
         """
@@ -442,7 +560,7 @@ class r0486848:
             a = np.random.randint(0, self._tsp.no_vertices)
             b = np.random.randint(0, self._tsp.no_vertices)
             # Return a new Individual object with the swap
-            return Individual(self.__get_swapped(individual.permutation, a, b), individual.mutation_chance)
+            return Individual(_get_swapped(individual.permutation, a, b), individual.mutation_chance)
         else:
             # The mutation should not happen here, return a copy of the original Individual
             return Individual(individual.permutation, individual.mutation_chance)
@@ -468,10 +586,10 @@ class r0486848:
 
     def _elimination_lambdaplusmu_with_crowding(self, offspring):
         """
-        Performs (λ + μ)-elimination on the current population extended with the given offspring
+        Performs (λ + μ)-elimination with crowding on the current population extended with the given offspring
     
         :param offspring: a Python list of Individual objects representing the newly created offspring
-        :return: a Python list of Individual objects representing a new, (λ + μ)-eliminated population
+        :return: a Python list of Individual objects representing a new, (λ + μ)-crowding-µeliminated population
         """
         k = 3
         
@@ -483,72 +601,24 @@ class r0486848:
         combined.extend(offspring)
         
         for _ in range(self._no_individuals_to_keep):
+            if len(combined) == 0:
+                break
+            
             currently_selected_individual = np.argmin([self._tsp.fitness(individual) for individual in combined])
             selected.append(combined[currently_selected_individual])
-            random_others = np.random.choice([*range(currently_selected_individual), *range(currently_selected_individual + 1, len(combined))], k)
-            individual_to_delete = random_others[np.argmin([combined[other].distance_to_other(combined[currently_selected_individual]) for other in random_others])]
-            del combined[max(currently_selected_individual, individual_to_delete)]
-            del combined[min(currently_selected_individual, individual_to_delete)]
+            if len(combined) > 1:
+                random_others = np.random.choice([*range(currently_selected_individual), *range(currently_selected_individual + 1, len(combined))], k)
+                individual_to_delete = random_others[np.argmin([combined[other].distance_to_other(combined[currently_selected_individual]) for other in random_others])]
+                del combined[max(currently_selected_individual, individual_to_delete)]
+                del combined[min(currently_selected_individual, individual_to_delete)]
+            else:
+                del combined[currently_selected_individual]
 
         return list(selected)
-        
-    def __get_nearest_neighbour_solution(self, starting_vertex):
-        """
-        Returns an Individual object representing the solution constructed starting from a certain vertex with the nearest neighbour heuristic
-        (https://en.wikipedia.org/wiki/Nearest_neighbour_algorithm)
-    
-        :param starting_vertex: integer representing the starting vertex
-        :return: Individual object representing nearest neighbour solution starting at starting_vertex
-        """
 
-        nn_solution = np.empty(self._tsp.no_vertices)
-        visited = []
-
-        # Start at starting_vertex
-        current_vertex = starting_vertex
-        # Mark starting_vertex as visited
-        visited.append(current_vertex)
-        # Record starting_vertex in solution
-        nn_solution[0] = current_vertex
-        # Select next vertex as closest unvisited one
-        edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
-        edge_weights[visited] = np.Inf
-        
-        if np.isinf(np.min(edge_weights)):
-            for v in range(np.size(edge_weights)):
-                 if v not in visited:
-                     next_vertex = v
-                     break
-        else:
-            next_vertex = np.argmin(edge_weights)
-        # Traverse the remaining vertices
-        for i in range(1, self._tsp.no_vertices):
-            # Go to the next vertex
-            current_vertex = next_vertex
-            # Mark next vertex as visited
-            visited.append(current_vertex)
-            # Record next vertex in solution
-            nn_solution[i] = current_vertex
-            # Select next vertex as closest unvisited one
-            edge_weights = np.copy(self._tsp.distance_matrix[current_vertex, :])
-            edge_weights[visited] = np.Inf
-            if np.isinf(np.min(edge_weights)):
-                for v in range(np.size(edge_weights)):
-                    if v not in visited:
-                        next_vertex = v
-                        break
-            else:
-                next_vertex = np.argmin(edge_weights)
-        
-        return Individual(nn_solution, self._mutation_chance)
-
-class RecombinationOperator(Enum):
-    PMX   = 1
-    HGREX = 2
-
-class EliminationScheme(Enum):
-    LAMBDAPLUSMU           = 1
-    LAMBDAPLUSMU_WCROWDING = 2
+    @property
+    def converged(self):
+        return self._converged
 
 class TSP:
     """
@@ -721,7 +791,6 @@ class Population:
     :attribute individuals: a Python list of Individual objects
     :attribute no_vertices: the number of vertices in an Individual
     """
-    
     def __init__(self, individuals, no_vertices):
         self._individuals = individuals
         self._no_vertices = no_vertices
@@ -760,6 +829,13 @@ class Population:
 
         file.close()
 
+    def get_subpopulations(self, m, return_rest = False):
+        e = int((len(self._individuals) - (len(self._individuals) % m)) / m)
+        sublists = [self._individuals[(i * e):((i + 1) * e)] for i in range(m)]
+        if return_rest == True:
+            sublists.append(self._individuals[(len(self._individuals) - (len(self._individuals) % m)):])
+        return [Population(sublist, self._no_vertices) for sublist in sublists]
+        
     @property
     def individuals(self):
         return self._individuals
@@ -802,3 +878,20 @@ class FixedSizeStack:
     @property
     def N(self):
         return self._N
+
+def __get_swapped(permutation, a, b):
+    """
+    Swaps the elements at indices a and b of the given permutation
+
+    :param permutation: a 1D-Numpy array representing the permutation we want to apply a swap to
+    :param a: first index of elements to swap
+    :param b: second index of elements to swap
+    :return: a new permutation based on the given one with the elements at indices a and b swapped
+    """
+        
+    # Create a copy of the permutation
+    permutation_copy = np.copy(permutation)
+    # Use Numpy's indexing-with-a-list feature to easily swap the elements in the copied permutation
+    permutation_copy[[b, a]] = permutation_copy[[a, b]]
+    # Return the copied permutation with the given elements swapped
+    return permutation_copy
