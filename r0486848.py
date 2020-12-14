@@ -28,6 +28,9 @@ def _get_swapped(permutation, a, b):
     # Return the copied permutation with the given elements swapped
     return permutation_copy
 
+def _get_pairs_cycle(l):
+    return [(l[i], l[(i + 1) % len(l)]) for i in range(len(l))]
+
 class PopulationGenerationScheme(Enum):
     RANDOM                  = 1
     NEAREST_NEIGHBOUR_BASED = 2
@@ -44,7 +47,7 @@ class r0486848:
     """
     This class manages the solving of a TSP with r0486848's evolutionary algorithm
     """ 
-    def __init__(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, population_size_factor, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
+    def __init__(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, population_size_factor, default_k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
         """
         Constructs the r0486848 TSP solver object with certain parameters that will be used for running the evolutionary algorithm
         
@@ -53,7 +56,7 @@ class r0486848:
         :param elimination_scheme: the elimination scheme
         :param no_islands: the number of islands to use (this evolutionary algorithm uses the island model)
         :param population_size_factor: population size is number of vertices in problem * this parameter
-        :param k: tournament size for k-tournament selection
+        :param default_k: default tournament size for k-tournament selection
         :param mu: number of offspring to generate from the population
         :param no_individuals_to_keep: number of individuals to keep in elimination steps
         :param mutation_chance: number between 0 and 1 representing the chance of mutation
@@ -74,8 +77,10 @@ class r0486848:
         self._recombination_operator = recombination_operator
         self._elimination_scheme = elimination_scheme
         self._no_islands = no_islands
+        self._island_swap_rate = island_swap_rate
+        self._island_no_swapped_individuals = island_no_swapped_individuals
         self._population_size_factor = population_size_factor
-        self._k = k
+        self._default_k = default_k
         self._mu = mu
         self._no_individuals_to_keep = no_individuals_to_keep
         self._mutation_chance = mutation_chance
@@ -103,14 +108,14 @@ class r0486848:
         # Report TSP instance heuristic benchmark performance
         nn_mean_fitness, nn_best_fitness = self._get_benchmarks()
         print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness:.5f}\n\tBest heuristic fitness = {nn_best_fitness:.5f}")
-        
+
         # Initialize the population
         complete_initial_population = self._get_initial_population()
         initial_subpopulations = complete_initial_population.get_subpopulations(self._no_islands, False)
         
         # Run evolutionary algorith on islands, keeping track of performance
-        iteration_number = 0
-        iteration_numbers = [iteration_number]
+        iteration_number = 1
+        iteration_numbers = [(iteration_number - 1)]
         current_mean_fitness = self._tsp.mean_fitness(complete_initial_population.individuals, True)
         current_best_fitness = self._tsp.best_fitness(complete_initial_population.individuals)
         mean_fitnesses = [current_mean_fitness]
@@ -120,6 +125,11 @@ class r0486848:
         evolutionary_algorithms = [self.__get_EA(subpopulation) for subpopulation in initial_subpopulations]
         with concurrent.futures.ThreadPoolExecutor() as executor:
             while(any([not ea.converged for ea in evolutionary_algorithms])):
+                if ( iteration_number % self._island_swap_rate ) == 0:
+                    pairs = _get_pairs_cycle(evolutionary_algorithms)
+                    for pair in pairs:
+                        pair[0].swap_individuals_with(pair[1], self._island_no_swapped_individuals)
+
                 current_subpopulation_futures = [executor.submit(ea.run_iteration) for ea in evolutionary_algorithms]
                 
                 current_population = Population([individual for current_subpopulation_future in current_subpopulation_futures for individual in current_subpopulation_future.result()], self._tsp.no_vertices)
@@ -128,7 +138,7 @@ class r0486848:
                 current_best_fitness = self._tsp.best_fitness(current_population.individuals)
                 no_converged_algorithms = sum(1 for ea in evolutionary_algorithms if ea.converged)
                 iteration_number += 1
-                iteration_numbers.append(iteration_number)
+                iteration_numbers.append(iteration_number - 1)
                 mean_fitnesses.append(current_mean_fitness)
                 best_fitnesses.append(current_best_fitness)
                 stdev_hamming_distances.append(current_population.get_stdev_distance_to_identity())
@@ -269,7 +279,7 @@ class r0486848:
         return(Population(starting_individuals, self._tsp.no_vertices))
 
     def __get_EA(self, population):
-        return EvolutionaryAlgorithm(self._tsp, self._recombination_operator, self._elimination_scheme, self._k, self._mu, self._no_individuals_to_keep, self._mutation_chance, self._mutation_chance_self_adaptivity, self._stopping_ratio, self._tolerances, population)
+        return EvolutionaryAlgorithm(self._tsp, self._recombination_operator, self._elimination_scheme, self._default_k, True, self._mu, self._no_individuals_to_keep, self._mutation_chance, self._mutation_chance_self_adaptivity, self._stopping_ratio, self._tolerances, population)
 
     def __get_nearest_neighbour_solution(self, starting_vertex):
         """
@@ -325,7 +335,7 @@ class EvolutionaryAlgorithm:
     """
     This class implements the evolutionary algorithm - its main loop and all of its components (initialization, selection, mutation, recombination, elimination)
     """
-    def __init__(self, tsp, recombination_operator, elimination_scheme, k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances, population):
+    def __init__(self, tsp, recombination_operator, elimination_scheme, default_k, enable_k_adaptivity, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances, population):
         """
         Constructs the evolutionary algorithm object
         
@@ -350,7 +360,8 @@ class EvolutionaryAlgorithm:
             EliminationScheme.LAMBDAPLUSMU: self._elimination_lambdaplusmu,
             EliminationScheme.LAMBDAPLUSMU_WCROWDING: self._elimination_lambdaplusmu_with_crowding
         }[elimination_scheme]
-        self._k = k
+        self._default_k = default_k
+        self._enable_k_adaptivity = enable_k_adaptivity
         self._mu = mu
         self._no_individuals_to_keep = no_individuals_to_keep
         self._mutation_chance = mutation_chance
@@ -363,6 +374,7 @@ class EvolutionaryAlgorithm:
         self._current_mean_fitness = self._tsp.mean_fitness(self._population.individuals, True)
         self._current_change = math.nan
         self._change_ratio = float('inf')
+        self._change_ratio_became_number = False
         self._change_ratios = FixedSizeStack(self._tolerances)
         self._change_ratios.push(self._change_ratio)
         
@@ -404,12 +416,29 @@ class EvolutionaryAlgorithm:
             self._change_ratio = float('inf')
         else:
             self._change_ratio = abs(self._current_change) / (abs(self._previous_change) + sys.float_info.epsilon)
+            if self._change_ratio_became_number == False:
+                self._change_ratio_became_number = True
+                self._first_change_ratio_number = self._change_ratio
+
         self._change_ratios.push(self._change_ratio)
 
         self._converged = not any([cr > self._stopping_ratio for cr in self._change_ratios])
 
         return self._population
 
+    def swap_individuals_with(self, other_ea, no_individuals_to_swap):
+        to_give_indices = np.random.choice(range(len(self._population.individuals)), no_individuals_to_swap)
+        to_give = [self._population.individuals[index] for index in to_give_indices]
+        to_get_indices = np.random.choice(range(len(other_ea._population.individuals)), no_individuals_to_swap)
+        to_get = [other_ea._population.individuals[index] for index in to_get_indices]
+        
+        self._population.individuals.extend(to_get)
+        for index in np.unique(to_get_indices)[::-1]:
+            del other_ea._population.individuals[index]
+        other_ea._population.individuals.extend(to_give)
+        for index in np.unique(to_give_indices)[::-1]:
+            del self._population.individuals[index]
+        
     def _selection(self):
         """
         Performs k-tournament selection
@@ -418,7 +447,7 @@ class EvolutionaryAlgorithm:
         """
         
         # Select k random individuals from the population
-        selected = list(np.random.choice(self._population.individuals, self._k))
+        selected = list(np.random.choice(self._population.individuals, self.k))
         # Map them to their fitness with a list comprehension
         fitnesses = [self._tsp.fitness(individual) for individual in selected]
         # Select the individual with the lowest (=best) fitness
@@ -619,6 +648,18 @@ class EvolutionaryAlgorithm:
     @property
     def converged(self):
         return self._converged
+
+    @property
+    def k(self):
+        if self._enable_k_adaptivity == True:
+            if self._change_ratio_became_number == False:
+                return self._default_k
+            else:
+                b = self._first_change_ratio_number
+                a = math.log((1 - 0.01) / 0.01) / (b - self._stopping_ratio)
+                return math.ceil(self._default_k / (1 + math.exp(-a * (self._change_ratio - b))))
+        else:
+            return self._default_k
 
 class TSP:
     """
@@ -835,6 +876,11 @@ class Population:
         if return_rest == True:
             sublists.append(self._individuals[(len(self._individuals) - (len(self._individuals) % m)):])
         return [Population(sublist, self._no_vertices) for sublist in sublists]
+    
+
+    @property
+    def size(self):
+        return len(self._individuals)
         
     @property
     def individuals(self):
@@ -878,20 +924,3 @@ class FixedSizeStack:
     @property
     def N(self):
         return self._N
-
-def __get_swapped(permutation, a, b):
-    """
-    Swaps the elements at indices a and b of the given permutation
-
-    :param permutation: a 1D-Numpy array representing the permutation we want to apply a swap to
-    :param a: first index of elements to swap
-    :param b: second index of elements to swap
-    :return: a new permutation based on the given one with the elements at indices a and b swapped
-    """
-        
-    # Create a copy of the permutation
-    permutation_copy = np.copy(permutation)
-    # Use Numpy's indexing-with-a-list feature to easily swap the elements in the copied permutation
-    permutation_copy[[b, a]] = permutation_copy[[a, b]]
-    # Return the copied permutation with the given elements swapped
-    return permutation_copy

@@ -15,8 +15,10 @@ if __name__ == '__main__':
   test_data_file = ''
   optimize_hyperparameters = False
   no_islands = 29
+  island_swap_rate = 3
+  island_no_swapped_individuals = 5
   population_size_factor = 100
-  k = 5
+  default_k = 30
   mu = 100
   no_individuals_to_keep = 100
   mutation_chance = 0.05
@@ -108,4 +110,4 @@ if __name__ == '__main__':
       print(p)
       
   else:
-    r0486848.r0486848(population_generation_scheme = r0486848.PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED, recombination_operator = r0486848.RecombinationOperator.HGREX, elimination_scheme = r0486848.EliminationScheme.LAMBDAPLUSMU, no_islands = no_islands, population_size_factor = population_size_factor, k = k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, mutation_chance = mutation_chance, mutation_chance_self_adaptivity = mutation_chance_self_adaptivity, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)
+    r0486848.r0486848(population_generation_scheme = r0486848.PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED, recombination_operator = r0486848.RecombinationOperator.HGREX, elimination_scheme = r0486848.EliminationScheme.LAMBDAPLUSMU, no_islands = no_islands, island_swap_rate = island_swap_rate, island_no_swapped_individuals = island_no_swapped_individuals, population_size_factor = population_size_factor, default_k = default_k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, mutation_chance = mutation_chance, mutation_chance_self_adaptivity = mutation_chance_self_adaptivity, stopping_ratio = stopping_ratio, tolerances = tolerances).optimize(test_data_file)
