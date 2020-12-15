@@ -14,13 +14,13 @@ if __name__ == '__main__':
 
   test_data_file = ''
   optimize_hyperparameters = False
-  no_islands = 29
+  no_islands = 5
   island_swap_rate = 3
-  island_no_swapped_individuals = 5
-  population_size_factor = 100
-  default_k = 30
-  mu = 100
-  no_individuals_to_keep = 100
+  island_no_swapped_individuals = 3
+  population_size_factor = 1.5
+  default_k = 14
+  mu = 58
+  no_individuals_to_keep = 58
   mutation_chance = 0.05
   mutation_chance_self_adaptivity = False
   stopping_ratio = 0.001

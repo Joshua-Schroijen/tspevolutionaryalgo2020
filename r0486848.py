@@ -103,7 +103,7 @@ class r0486848:
         
         # Set up TSP instance representation
         self._tsp = TSP(distanceMatrix)
-        self._population_size = self._population_size_factor * self._tsp.no_vertices
+        self._initial_population_size = self._population_size_factor * self._tsp.no_vertices
         
         # Report TSP instance heuristic benchmark performance
         nn_mean_fitness, nn_best_fitness = self._get_benchmarks()
@@ -163,11 +163,11 @@ class r0486848:
         # Report performance compared to heuristic benchmarks to screen
         last_mean_performance_difference_with_heuristic = 1 - (current_mean_fitness / nn_mean_fitness)
         last_best_performance_difference_with_heuristic = 1 - (current_best_fitness / nn_best_fitness)
-        report = f"Last iteration mean fitness was {last_mean_performance_difference_with_heuristic * 100:.2f}% "
+        report = f"Last iteration mean fitness was {abs(last_mean_performance_difference_with_heuristic) * 100:.2f}% "
         report += "better" if last_mean_performance_difference_with_heuristic >= 0 else "worse"
         report += " than mean heuristic solution fitness"
         print(report, flush=True)
-        report = f"Last iteration best fitness was {last_best_performance_difference_with_heuristic * 100:.2f}% "
+        report = f"Last iteration best fitness was {abs(last_best_performance_difference_with_heuristic) * 100:.2f}% "
         report += "better" if last_best_performance_difference_with_heuristic >= 0 else "worse"
         report += " than best heuristic solution fitness"
         print(report, flush=True)
@@ -249,7 +249,7 @@ class r0486848:
         
         :return: a Population object containing the generated initial population
         """
-        return(Population([Individual(np.random.permutation(self._tsp.no_vertices)) for _ in range(self._population_size_factor * self._tsp.no_vertices)], self._tsp.no_vertices))
+        return(Population([Individual(np.random.permutation(self._tsp.no_vertices)) for _ in range(int(self._population_size_factor * self._tsp.no_vertices))], self._tsp.no_vertices))
 
     def _get_nearest_neighbour_based_initial_population(self):
         """
@@ -270,7 +270,7 @@ class r0486848:
                 permutation = starting_individuals[vertex].permutation
                 # Sample the number of random swaps from a λ/4 - Poisson distribution
                 # This way we will get a lot of desired variation, but we mostly won't jump too far away from probably-good solutions
-                no_random_swaps = max(1, min(np.random.poisson(math.floor(self._population_size / 4)), self._population_size))
+                no_random_swaps = max(1, min(np.random.poisson(math.floor(self._initial_population_size / 4)), self._initial_population_size))
                 
                 # Execute the random swaps
                 for _ in range(no_random_swaps):
@@ -661,9 +661,9 @@ class EvolutionaryAlgorithm:
             if self._change_ratio_became_number == False:
                 return self._default_k
             else:
-                b = self._first_change_ratio_number / 2
-                a = math.log((self._default_k - 1) / 1) / (b - self._stopping_ratio)
-                return math.ceil(self._default_k / (1 + math.exp(-a * (self._change_ratio - b))))
+                b = self._first_change_ratio_number
+                a = math.log(((2 * self._default_k) - 1) / 1) / (b - self._stopping_ratio)
+                return math.ceil((2 * self._default_k) / (1 + math.exp(-a * (self._change_ratio - b))))
         else:
             return self._default_k
 
