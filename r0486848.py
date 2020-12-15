@@ -250,7 +250,7 @@ class r0486848:
         
         :return: a Population object containing the generated initial population
         """
-        return(Population([Individual(np.random.permutation(self._tsp.no_vertices)) for _ in range(int(self._population_size_factor * self._tsp.no_vertices))], self._tsp.no_vertices))
+        return(Population([Individual(np.random.permutation(self._tsp.no_vertices)) for _ in range(int(self._initial_population_size))], self._tsp.no_vertices))
 
     def _get_nearest_neighbour_based_initial_population(self):
         """
@@ -259,16 +259,13 @@ class r0486848:
         
         :return: a Population object containing the generated initial population
         """
-        starting_individuals = []
-        
-        # Add the set of nearest neighbour solutions starting at each possible vertex
-        for vertex in range(self._tsp.no_vertices):
-            starting_individuals.append(self.__get_nearest_neighbour_solution(vertex))
-        
-        # Create the (population_size_factor - 1) randomly swap mutated versions of each member
-        for _ in range(self._population_size_factor - 1):
-            for vertex in range(self._tsp.no_vertices):
-                permutation = starting_individuals[vertex].permutation
+        def add_individuals_for(vertex):
+            nn_solution = self.__get_nearest_neighbour_solution(vertex)
+            # Add the nearest neighbour solution starting at the given vertex to the population
+            starting_individuals[vertex] = nn_solution
+
+            for i in range(self._population_size_factor - 1):
+                permutation = nn_solution.permutation
                 # Sample the number of random swaps from a λ/4 - Poisson distribution
                 # This way we will get a lot of desired variation, but we mostly won't jump too far away from probably-good solutions
                 no_random_swaps = max(1, min(np.random.poisson(math.floor(self._initial_population_size / 4)), self._initial_population_size))
@@ -278,9 +275,14 @@ class r0486848:
                     a = np.random.randint(0, self._tsp.no_vertices)
                     b = np.random.randint(0, self._tsp.no_vertices)
                     permutation = _get_swapped(permutation, a, b)
-                
-                # Add the new, mutated version of the current member to the population
-                starting_individuals.append(Individual(permutation, self._mutation_chance))
+
+                # Add the new, mutated version of the nearest neighbour solution to the population
+                starting_individuals[self._tsp.no_vertices + (vertex * (self._population_size_factor - 1 )) + i] = Individual(permutation, self._mutation_chance)
+
+        starting_individuals = int(self._initial_population_size) * [0]
+        # Add the individuals for each vertex to the population (in parallel)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            concurrent.futures.wait([executor.submit(add_individuals_for, vertex) for vertex in range(self._tsp.no_vertices)])
 
         # Return the generated initial population
         return(Population(starting_individuals, self._tsp.no_vertices))
