@@ -42,6 +42,7 @@ class RecombinationOperator(Enum):
 class EliminationScheme(Enum):
     LAMBDAPLUSMU           = 1
     LAMBDAPLUSMU_WCROWDING = 2
+    LAMBDA_MU              = 3
 
 class r0486848:
     """
@@ -364,7 +365,8 @@ class EvolutionaryAlgorithm:
         }[recombination_operator]
         self._elimination = {
             EliminationScheme.LAMBDAPLUSMU: self._elimination_lambdaplusmu,
-            EliminationScheme.LAMBDAPLUSMU_WCROWDING: self._elimination_lambdaplusmu_with_crowding
+            EliminationScheme.LAMBDAPLUSMU_WCROWDING: self._elimination_lambdaplusmu_with_crowding,
+            EliminationScheme.LAMBDA_MU: self._elimination_lambdamu
         }[elimination_scheme]
         self._default_k = default_k
         self._enable_k_adaptivity = enable_k_adaptivity
@@ -624,7 +626,7 @@ class EvolutionaryAlgorithm:
         Performs (λ + μ)-elimination with crowding on the current population extended with the given offspring
     
         :param offspring: a Python list of Individual objects representing the newly created offspring
-        :return: a Python list of Individual objects representing a new, (λ + μ)-crowding-µeliminated population
+        :return: a Python list of Individual objects representing a new, (λ + μ)-crowding-eliminated population
         """
         k = 3
         
@@ -650,6 +652,20 @@ class EvolutionaryAlgorithm:
                 del combined[currently_selected_individual]
 
         return list(selected)
+
+    def _elimination_lambdamu(self, offspring):
+        """
+        Performs (λ, μ)-elimination
+    
+        :param offspring: a Python list of Individual objects representing the newly created offspring
+        :return: a Python list of Individual objects representing a new, (λ, μ)-eliminated population
+        """
+        offspring_array = np.array(offspring)
+        
+        # Get the no_individuals_to_keep shortest route individuals' indices in offspring
+        selected = np.argsort(np.array([self._tsp.fitness(individual) for individual in offspring_array]))[0:self._no_individuals_to_keep]
+        # Return the individuals at those indices
+        return list(offspring_array[selected])
 
     @property
     def converged(self):
