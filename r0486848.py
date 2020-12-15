@@ -48,7 +48,7 @@ class r0486848:
     """
     This class manages the solving of a TSP with r0486848's evolutionary algorithm
     """ 
-    def __init__(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, population_size_factor, default_k, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
+    def __init__(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, population_size_factor, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
         """
         Constructs the r0486848 TSP solver object with certain parameters that will be used for running the evolutionary algorithm
         
@@ -60,7 +60,8 @@ class r0486848:
         :param default_k: default tournament size for k-tournament selection
         :param mu: number of offspring to generate from the population
         :param no_individuals_to_keep: number of individuals to keep in elimination steps
-        :param mutation_chance: number between 0 and 1 representing the chance of mutation
+        :param default_mutation_chance: number between 0 and 1 representing the default chance of mutation
+        :param mutation_chance_feedback: if set to True, mutation chance feedback is enabled
         :param mutation_chance_self_adaptivity: if set to True, mutation chance self-adaptivity is enabled
         :param stopping_ratio: the relative improvement in the current iteration compared to the previous one below which, after tolerances iterations, to stop optimization
         :param tolerances: the number of iterations ran below the stopping ratio before optimization is stopped
@@ -84,8 +85,9 @@ class r0486848:
         self._default_k = default_k
         self._mu = mu
         self._no_individuals_to_keep = no_individuals_to_keep
-        self._mutation_chance = mutation_chance
+        self._default_mutation_chance = default_mutation_chance
         self._mutation_chance_self_adaptivity = mutation_chance_self_adaptivity
+        self._mutation_chance_feedback = mutation_chance_feedback
         self._stopping_ratio = stopping_ratio
         self._tolerances = tolerances
 
@@ -277,7 +279,7 @@ class r0486848:
                     permutation = _get_swapped(permutation, a, b)
 
                 # Add the new, mutated version of the nearest neighbour solution to the population
-                starting_individuals[self._tsp.no_vertices + (vertex * (self._population_size_factor - 1 )) + i] = Individual(permutation, self._mutation_chance)
+                starting_individuals[self._tsp.no_vertices + (vertex * (self._population_size_factor - 1 )) + i] = Individual(permutation, self._default_mutation_chance)
 
         starting_individuals = int(self._initial_population_size) * [0]
         # Add the individuals for each vertex to the population (in parallel)
@@ -288,7 +290,7 @@ class r0486848:
         return(Population(starting_individuals, self._tsp.no_vertices))
 
     def __get_EA(self, population):
-        return EvolutionaryAlgorithm(self._tsp, self._recombination_operator, self._elimination_scheme, self._default_k, True, self._mu, self._no_individuals_to_keep, self._mutation_chance, self._mutation_chance_self_adaptivity, self._stopping_ratio, self._tolerances, population)
+        return EvolutionaryAlgorithm(self._tsp, self._recombination_operator, self._elimination_scheme, self._default_k, True, self._mu, self._no_individuals_to_keep, self._default_mutation_chance, self._mutation_chance_feedback, self._mutation_chance_self_adaptivity, self._stopping_ratio, self._tolerances, population)
 
     def __get_nearest_neighbour_solution(self, starting_vertex):
         """
@@ -338,13 +340,13 @@ class r0486848:
             else:
                 next_vertex = np.argmin(edge_weights)
         
-        return Individual(nn_solution, self._mutation_chance)
+        return Individual(nn_solution, self._default_mutation_chance)
 
 class EvolutionaryAlgorithm:
     """
     This class implements the evolutionary algorithm - its main loop and all of its components (initialization, selection, mutation, recombination, elimination)
     """
-    def __init__(self, tsp, recombination_operator, elimination_scheme, default_k, enable_k_adaptivity, mu, no_individuals_to_keep, mutation_chance, mutation_chance_self_adaptivity, stopping_ratio, tolerances, population):
+    def __init__(self, tsp, recombination_operator, elimination_scheme, default_k, enable_k_adaptivity, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances, population):
         """
         Constructs the evolutionary algorithm object
         
@@ -374,7 +376,8 @@ class EvolutionaryAlgorithm:
         self._enable_k_adaptivity = enable_k_adaptivity
         self._mu = mu
         self._no_individuals_to_keep = no_individuals_to_keep
-        self._mutation_chance = mutation_chance
+        self._default_mutation_chance = default_mutation_chance
+        self._mutation_chance_feedback = mutation_chance_feedback
         self._mutation_chance_self_adaptivity = mutation_chance_self_adaptivity
         self._stopping_ratio = stopping_ratio
         self._tolerances = tolerances
@@ -531,7 +534,7 @@ class EvolutionaryAlgorithm:
         if self._mutation_chance_self_adaptivity:
           child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
         else:
-          child_mutation_chance = self._mutation_chance
+          child_mutation_chance = self._default_mutation_chance
         # Return a new Individual object based on the recombined child permutation and mutation chance
         return [Individual(np.array(child_permutation), child_mutation_chance)]
         
@@ -566,7 +569,7 @@ class EvolutionaryAlgorithm:
             if self._mutation_chance_self_adaptivity:
                 child_mutation_chance = first_parent.mutation_chance + ((2 * np.random.rand() - 0.5) * abs(second_parent.mutation_chance - first_parent.mutation_chance))
             else:
-                child_mutation_chance = self._mutation_chance
+                child_mutation_chance = self._default_mutation_chance
             return Individual(np.array(child_permutation), child_mutation_chance)
 
         # Choose a random index vertex
@@ -594,7 +597,7 @@ class EvolutionaryAlgorithm:
         """
 
         # Do the mutation with random chance individual.mutation_chance
-        if np.random.rand() <= individual.mutation_chance:
+        if np.random.rand() <= self.__get_mutation_chance(individual):
             # Draw two random numbers representing the indices of the vertices to be swapped in the permutation
             a = np.random.randint(0, self._tsp.no_vertices)
             b = np.random.randint(0, self._tsp.no_vertices)
@@ -669,6 +672,20 @@ class EvolutionaryAlgorithm:
         # Return the individuals at those indices
         return list(offspring_array[selected])
 
+    def __get_mutation_chance(self, individual):
+        if self._mutation_chance_self_adaptivity == True:
+            return individual.mutation_chance
+        else:
+            if self._mutation_chance_feedback == True:
+                if self._change_ratio_became_number == False:
+                    return self._default_mutation_chance
+                else:
+                    b = self._first_change_ratio_number
+                    a = math.log(((2 * self._default_mutation_chance) - 0.01) / 0.01) / (b - self._stopping_ratio)
+                    return math.ceil((2 * self._default_mutation_chance) / (1 + math.exp(-a * (self._change_ratio - b))))
+            else:
+                return self._default_mutation_chance
+    
     @property
     def converged(self):
         return self._converged
