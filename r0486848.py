@@ -655,8 +655,8 @@ class EvolutionaryAlgorithm:
             if self._change_ratio_became_number == False:
                 return self._default_k
             else:
-                b = self._first_change_ratio_number
-                a = math.log((1 - 0.01) / 0.01) / (b - self._stopping_ratio)
+                b = self._first_change_ratio_number / 2
+                a = math.log((self._default_k - 1) / 1) / (b - self._stopping_ratio)
                 return math.ceil(self._default_k / (1 + math.exp(-a * (self._change_ratio - b))))
         else:
             return self._default_k
