@@ -92,7 +92,7 @@ class r0486848:
     
     @profile_decorator.profile("algorithm_profile.txt")
     def optimize(self, filename):   
-        print("Starting evolutionary algorithm ...")
+        print("Starting evolutionary algorithm ...", flush=True)
         # Start timer for assessing optimization speed
         start_time = timeit.default_timer()
 
@@ -107,10 +107,11 @@ class r0486848:
         
         # Report TSP instance heuristic benchmark performance
         nn_mean_fitness, nn_best_fitness = self._get_benchmarks()
-        print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness:.5f}\n\tBest heuristic fitness = {nn_best_fitness:.5f}")
+        print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness:.5f}\n\tBest heuristic fitness = {nn_best_fitness:.5f}", flush=True)
 
         # Initialize the population
         complete_initial_population = self._get_initial_population()
+        print("Initial population generated", flush=True)
         initial_subpopulations = complete_initial_population.get_subpopulations(self._no_islands, False)
         
         # Run evolutionary algorith on islands, keeping track of performance
@@ -150,26 +151,26 @@ class r0486848:
                 #    with city numbering starting from 0
                 timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, self._tsp.best_individual(current_population.individuals).permutation)
                 # Report iteration results
-                print(f"Iteration complete. {no_converged_algorithms} out of {len(evolutionary_algorithms)} islands converged, time left = {timeLeft:.3f} seconds")
-                print(f"\tCurrent mean fitness = {current_mean_fitness:.5f}, current best fitness = {current_best_fitness:.5f}")
+                print(f"Iteration complete. {no_converged_algorithms} out of {len(evolutionary_algorithms)} islands converged, time left = {timeLeft:.3f} seconds", flush=True)
+                print(f"\tCurrent mean fitness = {current_mean_fitness:.5f}, current best fitness = {current_best_fitness:.5f}", flush=True)
                 # Stop optimizing if out of time
                 if timeLeft < 0:
                     break
         
         # Report optimization speed to screen
         elapsed = timeit.default_timer() - start_time
-        print(f"Evolutionary algorithm finished in {elapsed:.3f} seconds")
+        print(f"Evolutionary algorithm finished in {elapsed:.3f} seconds", flush=True)
         # Report performance compared to heuristic benchmarks to screen
         last_mean_performance_difference_with_heuristic = 1 - (current_mean_fitness / nn_mean_fitness)
         last_best_performance_difference_with_heuristic = 1 - (current_best_fitness / nn_best_fitness)
         report = f"Last iteration mean fitness was {last_mean_performance_difference_with_heuristic * 100:.2f}% "
         report += "better" if last_mean_performance_difference_with_heuristic >= 0 else "worse"
         report += " than mean heuristic solution fitness"
-        print(report)
+        print(report, flush=True)
         report = f"Last iteration best fitness was {last_best_performance_difference_with_heuristic * 100:.2f}% "
         report += "better" if last_best_performance_difference_with_heuristic >= 0 else "worse"
         report += " than best heuristic solution fitness"
-        print(report)
+        print(report, flush=True)
                 
         # Generate plots of the mean and best fitnesses as the iterations progress and save them to r0486848_means.png and r0486848_bests.png respectively
         plt.figure()
@@ -243,7 +244,12 @@ class r0486848:
         return (self._tsp.mean_fitness(nn_individuals, True), self._tsp.best_fitness(nn_individuals))
 
     def _get_random_initial_population(self):
-        pass
+        """
+        Creates a population by generating population_size_factor * number of cities random permutations
+        
+        :return: a Population object containing the generated initial population
+        """
+        return(Population([Individual(np.random.permutation(self._tsp.no_vertices)) for _ in range(self._population_size_factor * self._tsp.no_vertices)], self._tsp.no_vertices))
 
     def _get_nearest_neighbour_based_initial_population(self):
         """
