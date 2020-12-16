@@ -65,10 +65,22 @@ class EliminationScheme(Enum):
 class r0486848:
     """
     This class manages the solving of a TSP with r0486848's evolutionary algorithm
-    """ 
-    def __init__(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, population_size_factor, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances, provide_analytics):
+    """
+    def __init__(self):
         """
-        Constructs the r0486848 TSP solver object with certain parameters that will be used for running the evolutionary algorithm
+        Constructs the r0486848 TSP solver object that will be used for running the evolutionary algorithm
+        """
+        # Initialize and save Reporter class instance
+        self.reporter = Reporter.Reporter(self.__class__.__name__)
+
+        self._optimize = self.optimize
+        self._tsp = None
+
+        self.set_parameters(population_generation_scheme = PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED, recombination_operator = RecombinationOperator.HGREX, elimination_scheme = EliminationScheme.LAMBDA_MU, no_islands = 5, island_swap_rate = 3, island_no_swapped_individuals = 3, population_size_factor = 2, default_k = 14, mu = 58, no_individuals_to_keep = 58, default_mutation_chance = 0.05, mutation_chance_feedback = False, mutation_chance_self_adaptivity = True, stopping_ratio = 0.001, tolerances = 3, provide_analytics = True)
+        
+    def set_parameters(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, population_size_factor, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances, provide_analytics):
+        """
+        Sets the evolutionary algorithm's parameters
         
         :param population_generation_scheme: the population generation scheme
         :param reombination_operator: the recombination operator to use
@@ -85,10 +97,6 @@ class r0486848:
         :param tolerances: the number of iterations ran below the stopping ratio before optimization is stopped
         :return: an initialized evolutionary algorithm object of class r0486848
         """
-        
-        # Initialize and save Reporter class instance
-        self.reporter = Reporter.Reporter(self.__class__.__name__)
-
         # Copy given evolutionary algorithm parameters to attributes
         self._get_initial_population = {
             PopulationGenerationScheme.RANDOM: self._get_random_initial_population,
@@ -108,15 +116,15 @@ class r0486848:
         self._mutation_chance_feedback = mutation_chance_feedback
         self._stopping_ratio = stopping_ratio
         self._tolerances = tolerances
-
-        self._tsp = None
     
         self._provide_analytics = provide_analytics
         if self._provide_analytics == True:
-            self.optimize = profile("algorithm_profile.txt")(self.optimize)
+            self.optimize = profile("algorithm_profile.txt")(self._optimize)
+        else:
+            self.optimize = self._optimize
 
-    def optimize(self, filename):   
-        print("Starting evolutionary algorithm ...", flush=True)
+    def optimize(self, filename, verbose=False):   
+        if verbose == True: print("Starting evolutionary algorithm ...", flush=True)
         # Start timer for assessing optimization speed
         start_time = timeit.default_timer()
 
@@ -131,11 +139,11 @@ class r0486848:
         
         # Report TSP instance heuristic benchmark performance
         nn_mean_fitness, nn_best_fitness = self._get_benchmarks()
-        print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness:.5f}\n\tBest heuristic fitness = {nn_best_fitness:.5f}", flush=True)
+        if verbose == True: print(f"Benchmarks:\n\tMean heuristic fitness = {nn_mean_fitness:.5f}\n\tBest heuristic fitness = {nn_best_fitness:.5f}", flush=True)
 
         # Initialize the population
         complete_initial_population = self._get_initial_population()
-        print("Initial population generated", flush=True)
+        if verbose == True: print("Initial population generated", flush=True)
         initial_subpopulations = complete_initial_population.get_subpopulations(self._no_islands, False)
         
         # Run evolutionary algorith on islands, keeping track of performance
@@ -176,26 +184,26 @@ class r0486848:
                 #    with city numbering starting from 0
                 timeLeft = self.reporter.report(current_mean_fitness, current_best_fitness, self._tsp.best_individual(current_population.individuals).permutation)
                 # Report iteration results
-                print(f"Iteration complete. {no_converged_algorithms} out of {len(evolutionary_algorithms)} islands converged, time left = {timeLeft:.3f} seconds", flush=True)
-                print(f"\tCurrent mean fitness = {current_mean_fitness:.5f}, current best fitness = {current_best_fitness:.5f}", flush=True)
+                if verbose == True: print(f"Iteration complete. {no_converged_algorithms} out of {len(evolutionary_algorithms)} islands converged, time left = {timeLeft:.3f} seconds", flush=True)
+                if verbose == True: print(f"\tCurrent mean fitness = {current_mean_fitness:.5f}, current best fitness = {current_best_fitness:.5f}", flush=True)
                 # Stop optimizing if out of time
                 if timeLeft < 0:
                     break
         
         # Report optimization speed to screen
         elapsed = timeit.default_timer() - start_time
-        print(f"Evolutionary algorithm finished in {elapsed:.3f} seconds", flush=True)
+        if verbose == True: print(f"Evolutionary algorithm finished in {elapsed:.3f} seconds", flush=True)
         # Report performance compared to heuristic benchmarks to screen
         last_mean_performance_difference_with_heuristic = 1 - (current_mean_fitness / nn_mean_fitness)
         last_best_performance_difference_with_heuristic = 1 - (current_best_fitness / nn_best_fitness)
         report = f"Last iteration mean fitness was {abs(last_mean_performance_difference_with_heuristic) * 100:.2f}% "
         report += "better" if last_mean_performance_difference_with_heuristic >= 0 else "worse"
         report += " than mean heuristic solution fitness"
-        print(report, flush=True)
+        if verbose == True: print(report, flush=True)
         report = f"Last iteration best fitness was {abs(last_best_performance_difference_with_heuristic) * 100:.2f}% "
         report += "better" if last_best_performance_difference_with_heuristic >= 0 else "worse"
         report += " than best heuristic solution fitness"
-        print(report, flush=True)
+        if verbose == True: print(report, flush=True)
         
         if self._provide_analytics == True:
             ticks_step = ((iteration_number + 1) // 10) + 1
