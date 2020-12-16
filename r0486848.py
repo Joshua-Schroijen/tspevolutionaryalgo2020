@@ -145,7 +145,7 @@ class r0486848:
         current_best_fitness = self._tsp.best_fitness(complete_initial_population.individuals)
         mean_fitnesses = [current_mean_fitness]
         best_fitnesses = [current_best_fitness]
-        if self._provide_analytics == True: stdev_hamming_distances = [complete_initial_population.get_stdev_distance_to_identity()]
+        if self._provide_analytics == True: mean_distances_to_others = [complete_initial_population.get_mean_distance_to_others()]
         
         evolutionary_algorithms = [self.__get_EA(subpopulation) for subpopulation in initial_subpopulations]
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -167,7 +167,7 @@ class r0486848:
                 mean_fitnesses.append(current_mean_fitness)
                 best_fitnesses.append(current_best_fitness)
                 
-                if self._provide_analytics == True: stdev_hamming_distances.append(current_population.get_stdev_distance_to_identity())
+                if self._provide_analytics == True: mean_distances_to_others.append(current_population.get_mean_distance_to_others())
                
                 # Call the reporter with:
                 #  - the mean objective function value of the population
@@ -198,6 +198,8 @@ class r0486848:
         print(report, flush=True)
         
         if self._provide_analytics == True:
+            ticks_step = ((iteration_number + 1) // 10) + 1
+            
             # Generate plots of the mean and best fitnesses as the iterations progress and save them to r0486848_means.png and r0486848_bests.png respectively
             plt.figure()
             plt.plot(iteration_numbers, mean_fitnesses, label="Mean fitness")
@@ -210,7 +212,7 @@ class r0486848:
             lower_y_bound = min(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 0.8
             upper_y_bound = max(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 1.2
             plt.ylim([lower_y_bound, upper_y_bound])
-            plt.xticks(range(0, len(iteration_numbers) , 1))
+            plt.xticks(range(0, len(iteration_numbers), ticks_step))
             plt.savefig('r0486848_means.png')
             plt.figure()
             plt.plot(iteration_numbers, best_fitnesses, label="Best fitness")
@@ -223,20 +225,20 @@ class r0486848:
             lower_y_bound = min(itertools.chain(best_fitnesses, [nn_best_fitness])) * 0.8
             upper_y_bound = max(itertools.chain(best_fitnesses, [nn_best_fitness])) * 1.2
             plt.ylim([lower_y_bound, upper_y_bound])
-            plt.xticks(range(0, len(iteration_numbers), 1))
+            plt.xticks(range(0, len(iteration_numbers), ticks_step))
             plt.savefig('r0486848_bests.png')
 
-            # Plot the evolution of the standard deviation of the Hamming distances to the identity permutations
+            # Plot the evolution of the mean distance from individuals to eachother in the population
             plt.figure()
-            plt.plot(iteration_numbers, stdev_hamming_distances, label="σ of Hamming distances to the identity permutation")
-            plt.title('σ of Hamming distances to the identity permutation vs. iteration')
+            plt.plot(iteration_numbers, mean_distances_to_others, label="Mean distance from individuals to eachother")
+            plt.title('Mean distance from individuals to eachother vs. iteration')
             plt.legend()
             plt.xlabel("Iteration")
-            plt.ylabel("σ")
+            plt.ylabel("Mean distance from individuals to eachothe")
             plt.xlim([0, len(iteration_numbers) - 1])
             plt.ylim([0, self._tsp.no_vertices - 1])
-            plt.xticks(range(0, len(iteration_numbers), 1))
-            plt.savefig('r0486848_stdev_distances.png')
+            plt.xticks(range(0, len(iteration_numbers), ticks_step))
+            plt.savefig('r0486848_mean_distance_from_individuals_to_eachother.png')
         
             # Plot the final population distribution and save it to r0486848_last_distribution.png
             plt.figure()
@@ -916,7 +918,18 @@ class Population:
 
         return bins
 
-
+    def get_mean_distance_to_others(self):
+        no_individuals = len(self._individuals)
+        distance_matrix = np.zeros((no_individuals, no_individuals))
+        
+        for individual_index in range(no_individuals):
+            for other_individual_index in range((individual_index + 1), no_individuals):
+                d = self._individuals[individual_index].distance_to_other(self._individuals[other_individual_index])
+                distance_matrix[individual_index, other_individual_index] = d
+                distance_matrix[other_individual_index, individual_index] = d
+        
+        return (np.mean(distance_matrix) * ((no_individuals ** 2)/((no_individuals ** 2) - no_individuals)))
+    
     def get_stdev_distance_to_identity(self):
         """
         Returns the standard deviation of the Hamming distances to the identity permutation

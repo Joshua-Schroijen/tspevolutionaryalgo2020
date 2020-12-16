@@ -26,7 +26,7 @@ if __name__ == '__main__':
   mutation_chance_self_adaptivity = False
   stopping_ratio = 0.001
   tolerances = 3
-  provide_analytics = False
+  provide_analytics = True
   
   try:
     opts, _ = getopt.getopt(sys.argv[1:], "oi:p:k:mu:nitk:sr:t:", ["optimize-hyperparameters", "input="])
