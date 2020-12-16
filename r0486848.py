@@ -3,13 +3,31 @@ import statistics
 import collections
 import itertools
 import timeit
+import cProfile, pstats
 import sys
 import concurrent.futures
 import numpy as np
 import matplotlib.pyplot as plt
-import profile_decorator
 import Reporter
 from enum import Enum
+
+def profile(filename):
+    def _profile(function):
+        def wrapped(*args, **kwargs):
+            profile = cProfile.Profile()
+            profile.enable()
+            retval = function(*args, **kwargs)
+            profile.disable()
+            output_file = open(filename, "w", encoding="utf-8")
+            stats = pstats.Stats(profile, stream=output_file).sort_stats("cumulative")
+            stats.print_stats()
+            output_file.close()
+
+            return retval
+
+        return wrapped
+
+    return _profile
 
 def _get_swapped(permutation, a, b):
     """
@@ -48,7 +66,7 @@ class r0486848:
     """
     This class manages the solving of a TSP with r0486848's evolutionary algorithm
     """ 
-    def __init__(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, population_size_factor, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
+    def __init__(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, population_size_factor, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances, provide_analytics):
         """
         Constructs the r0486848 TSP solver object with certain parameters that will be used for running the evolutionary algorithm
         
@@ -93,7 +111,10 @@ class r0486848:
 
         self._tsp = None
     
-    @profile_decorator.profile("algorithm_profile.txt")
+        self._provide_analytics = provide_analytics
+        if self._provide_analytics == True:
+            self.optimize = profile("algorithm_profile.txt")(self.optimize)
+
     def optimize(self, filename):   
         print("Starting evolutionary algorithm ...", flush=True)
         # Start timer for assessing optimization speed
@@ -124,7 +145,7 @@ class r0486848:
         current_best_fitness = self._tsp.best_fitness(complete_initial_population.individuals)
         mean_fitnesses = [current_mean_fitness]
         best_fitnesses = [current_best_fitness]
-        stdev_hamming_distances = [complete_initial_population.get_stdev_distance_to_identity()]
+        if self._provide_analytics == True: stdev_hamming_distances = [complete_initial_population.get_stdev_distance_to_identity()]
         
         evolutionary_algorithms = [self.__get_EA(subpopulation) for subpopulation in initial_subpopulations]
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -145,7 +166,8 @@ class r0486848:
                 iteration_numbers.append(iteration_number - 1)
                 mean_fitnesses.append(current_mean_fitness)
                 best_fitnesses.append(current_best_fitness)
-                stdev_hamming_distances.append(current_population.get_stdev_distance_to_identity())
+                
+                if self._provide_analytics == True: stdev_hamming_distances.append(current_population.get_stdev_distance_to_identity())
                
                 # Call the reporter with:
                 #  - the mean objective function value of the population
@@ -174,57 +196,58 @@ class r0486848:
         report += "better" if last_best_performance_difference_with_heuristic >= 0 else "worse"
         report += " than best heuristic solution fitness"
         print(report, flush=True)
-                
-        # Generate plots of the mean and best fitnesses as the iterations progress and save them to r0486848_means.png and r0486848_bests.png respectively
-        plt.figure()
-        plt.plot(iteration_numbers, mean_fitnesses, label="Mean fitness")
-        plt.hlines(nn_mean_fitness, 0, len(iteration_numbers) - 1, label="Mean heuristic fitness", colors="r")
-        plt.title('Mean fitness vs. iteration')
-        plt.legend()
-        plt.xlabel("Iteration")
-        plt.ylabel("Fitness")
-        plt.xlim([0, len(iteration_numbers) - 1])
-        lower_y_bound = min(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 0.8
-        upper_y_bound = max(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 1.2
-        plt.ylim([lower_y_bound, upper_y_bound])
-        plt.xticks(range(0, len(iteration_numbers) , 1))
-        plt.savefig('r0486848_means.png')
-        plt.figure()
-        plt.plot(iteration_numbers, best_fitnesses, label="Best fitness")
-        plt.hlines(nn_best_fitness, 0, len(iteration_numbers) - 1, label="Best heuristic fitness", colors="r")
-        plt.title('Best fitness vs. iteration')
-        plt.legend()
-        plt.xlabel("Iteration")
-        plt.ylabel("Fitness")
-        plt.xlim([0, len(iteration_numbers) - 1])
-        lower_y_bound = min(itertools.chain(best_fitnesses, [nn_best_fitness])) * 0.8
-        upper_y_bound = max(itertools.chain(best_fitnesses, [nn_best_fitness])) * 1.2
-        plt.ylim([lower_y_bound, upper_y_bound])
-        plt.xticks(range(0, len(iteration_numbers), 1))
-        plt.savefig('r0486848_bests.png')
-
-        # Plot the evolution of the standard deviation of the Hamming distances to the identity permutations
-        plt.figure()
-        plt.plot(iteration_numbers, stdev_hamming_distances, label="σ of Hamming distances to the identity permutation")
-        plt.title('σ of Hamming distances to the identity permutation vs. iteration')
-        plt.legend()
-        plt.xlabel("Iteration")
-        plt.ylabel("σ")
-        plt.xlim([0, len(iteration_numbers) - 1])
-        plt.ylim([0, self._tsp.no_vertices - 1])
-        plt.xticks(range(0, len(iteration_numbers), 1))
-        plt.savefig('r0486848_stdev_distances.png')
         
-        # Plot the final population distribution and save it to r0486848_last_distribution.png
-        plt.figure()
-        plt.bar(range(self._tsp.no_vertices), current_population.get_distribution())
-        plt.title('Distribution of individuals')
-        plt.xlabel('Distance to identity permutation')
-        plt.ylabel('# individuals')
-        plt.savefig('r0486848_last_distribution.png')
+        if self._provide_analytics == True:
+            # Generate plots of the mean and best fitnesses as the iterations progress and save them to r0486848_means.png and r0486848_bests.png respectively
+            plt.figure()
+            plt.plot(iteration_numbers, mean_fitnesses, label="Mean fitness")
+            plt.hlines(nn_mean_fitness, 0, len(iteration_numbers) - 1, label="Mean heuristic fitness", colors="r")
+            plt.title('Mean fitness vs. iteration')
+            plt.legend()
+            plt.xlabel("Iteration")
+            plt.ylabel("Fitness")
+            plt.xlim([0, len(iteration_numbers) - 1])
+            lower_y_bound = min(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 0.8
+            upper_y_bound = max(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 1.2
+            plt.ylim([lower_y_bound, upper_y_bound])
+            plt.xticks(range(0, len(iteration_numbers) , 1))
+            plt.savefig('r0486848_means.png')
+            plt.figure()
+            plt.plot(iteration_numbers, best_fitnesses, label="Best fitness")
+            plt.hlines(nn_best_fitness, 0, len(iteration_numbers) - 1, label="Best heuristic fitness", colors="r")
+            plt.title('Best fitness vs. iteration')
+            plt.legend()
+            plt.xlabel("Iteration")
+            plt.ylabel("Fitness")
+            plt.xlim([0, len(iteration_numbers) - 1])
+            lower_y_bound = min(itertools.chain(best_fitnesses, [nn_best_fitness])) * 0.8
+            upper_y_bound = max(itertools.chain(best_fitnesses, [nn_best_fitness])) * 1.2
+            plt.ylim([lower_y_bound, upper_y_bound])
+            plt.xticks(range(0, len(iteration_numbers), 1))
+            plt.savefig('r0486848_bests.png')
 
-        # Write the last population's contents to r0486848_last_population.txt        
-        current_population.write_to_file("r0486848_last_population.txt")
+            # Plot the evolution of the standard deviation of the Hamming distances to the identity permutations
+            plt.figure()
+            plt.plot(iteration_numbers, stdev_hamming_distances, label="σ of Hamming distances to the identity permutation")
+            plt.title('σ of Hamming distances to the identity permutation vs. iteration')
+            plt.legend()
+            plt.xlabel("Iteration")
+            plt.ylabel("σ")
+            plt.xlim([0, len(iteration_numbers) - 1])
+            plt.ylim([0, self._tsp.no_vertices - 1])
+            plt.xticks(range(0, len(iteration_numbers), 1))
+            plt.savefig('r0486848_stdev_distances.png')
+        
+            # Plot the final population distribution and save it to r0486848_last_distribution.png
+            plt.figure()
+            plt.bar(range(self._tsp.no_vertices), current_population.get_distribution())
+            plt.title('Distribution of individuals')
+            plt.xlabel('Distance to identity permutation')
+            plt.ylabel('# individuals')
+            plt.savefig('r0486848_last_distribution.png')
+
+            # Write the last population's contents to r0486848_last_population.txt        
+            current_population.write_to_file("r0486848_last_population.txt")
 
         # Return performance results of the optimization
         return (current_mean_fitness, current_best_fitness)    
@@ -892,7 +915,8 @@ class Population:
             bins[distance_to_identity] += 1
 
         return bins
-        
+
+
     def get_stdev_distance_to_identity(self):
         """
         Returns the standard deviation of the Hamming distances to the identity permutation
@@ -918,7 +942,6 @@ class Population:
             sublists.append(self._individuals[(len(self._individuals) - (len(self._individuals) % m)):])
         return [Population(sublist, self._no_vertices) for sublist in sublists]
     
-
     @property
     def size(self):
         return len(self._individuals)
