@@ -736,12 +736,19 @@ class EvolutionaryAlgorithm:
             return self._default_k
 
 class TSP:
+
     """
     This class represents the TSP problem instance we're trying to solve
 
     :attribute distance_matrix: a 2D Numpy array where element [i, j] = d(i, j) in the TSP graph, not symmetric!
     :attribute no_vertices: the number of vertices (cities) in the problem
     """
+    @staticmethod
+    def get_random(no_vertices):
+        distance_matrix = np.random.rand(no_vertices, no_vertices)
+        np.fill_diagonal(distance_matrix, 0)
+        print(distance_matrix)
+        return TSP(distance_matrix)
 
     def __init__(self, distance_matrix):
         self._distance_matrix = distance_matrix
