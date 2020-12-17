@@ -1,0 +1,26 @@
+--------------------------------------------------
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	inf
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	inf
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	inf
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	inf
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	inf
+Current combination new best? NO
