@@ -123,18 +123,22 @@ class r0486848:
         else:
             self.optimize = self._optimize
 
-    def optimize(self, filename, verbose=False):   
+    def optimize(self, source, verbose=False):   
         if verbose == True: print("Starting evolutionary algorithm ...", flush=True)
         # Start timer for assessing optimization speed
         start_time = timeit.default_timer()
 
-        # Import TSP instance
-        file = open(filename)
-        distanceMatrix = np.loadtxt(file, delimiter=",")
-        file.close()
+        if isinstance(source, TSP):
+            self._tsp = source
+        else:
+            # Import TSP instance
+            file = open(source)
+            distanceMatrix = np.loadtxt(file, delimiter=",")
+            file.close()
         
-        # Set up TSP instance representation
-        self._tsp = TSP(distanceMatrix)
+            # Set up TSP instance representation
+            self._tsp = TSP(distanceMatrix)
+        
         self._initial_population_size = self._population_size_factor * self._tsp.no_vertices
         
         # Report TSP instance heuristic benchmark performance
@@ -747,7 +751,6 @@ class TSP:
     def get_random(no_vertices):
         distance_matrix = np.random.rand(no_vertices, no_vertices)
         np.fill_diagonal(distance_matrix, 0)
-        print(distance_matrix)
         return TSP(distance_matrix)
 
     def __init__(self, distance_matrix):
@@ -981,7 +984,7 @@ class Population:
     @individuals.setter
     def individuals(self, individuals):
         self._individuals = individuals
-    
+
 class FixedSizeStack:
     """
     This class implements a very simple iterable fixed size stack (to which you can only push) of variable size N
@@ -1016,3 +1019,39 @@ class FixedSizeStack:
     @property
     def N(self):
         return self._N
+        
+class Combinations:
+    def __init__(self, *args):
+        self._lists = [arg for arg in args if len(arg) > 0]
+        self._no_lists = len(self._lists)
+        self._lists_lengths = [len(l) for l in self._lists]
+        self._cur_pos = self._no_lists * [0]
+        self._max_pos = [(length - 1) for length in self._lists_lengths]
+
+        self._finished = False
+
+    def __iter__(self):
+        return self
+
+    def __len__(self):
+        return np.prod(self._lists_lengths)
+
+    def __next__(self):
+        if self._finished == True:
+            raise StopIteration
+        else:
+            to_return = ()
+            for l, i in enumerate(self._cur_pos):
+                to_return += (self._lists[l][i], )
+
+            if self._cur_pos == self._max_pos:
+                 self._finished = True
+            else:
+                for i in range((self._no_lists - 1), -1, -1):
+                    if self._cur_pos[i] != (self._lists_lengths[i] - 1):
+                        self._cur_pos[i] += 1
+                        break
+                    else:
+                        self._cur_pos[i] = 0
+                
+            return to_return
