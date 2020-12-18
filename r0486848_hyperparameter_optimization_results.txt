@@ -1,26 +1,16 @@
 --------------------------------------------------
 Current combination =
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 8, 2, 7, 28, 28, 0.05, False, False, 0.001, 3, False)
 Current combination average =
-	inf
-Current combination new best? NO
+	32.729499664328905
+Current combination new best? YES
 Current combination =
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, False, True, 0.001, 3, False)
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 6, 8, 2, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
 Current combination average =
-	inf
-Current combination new best? NO
-Current combination =
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, True, False, 0.001, 3, False)
-Current combination average =
-	inf
-Current combination new best? NO
-Current combination =
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, True, True, 0.001, 3, False)
-Current combination average =
-	inf
-Current combination new best? NO
-Current combination =
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.1, False, False, 0.001, 3, False)
-Current combination average =
-	inf
-Current combination new best? NO
+	32.135628381110955
+Current combination new best? YES
+--------------------------------------------------
+Best combination was
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 6, 8, 2, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
+Best combination average was
+	32.135628381110955
