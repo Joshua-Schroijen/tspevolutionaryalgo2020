@@ -1,16 +1,16 @@
 --------------------------------------------------
 Current combination =
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 8, 2, 7, 28, 28, 0.05, False, False, 0.001, 3, False)
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 1, 2, 7, 28, 28, 0.1, False, False, 0.001, 3, False)
 Current combination average =
-	32.729499664328905
+	32.88923140804321
 Current combination new best? YES
 Current combination =
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 6, 8, 2, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 1, 2, 7, 28, 28, 0.05, False, False, 0.001, 3, False)
 Current combination average =
-	32.135628381110955
+	32.83509850795626
 Current combination new best? YES
 --------------------------------------------------
 Best combination was
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 6, 8, 2, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 1, 2, 7, 28, 28, 0.05, False, False, 0.001, 3, False)
 Best combination average was
-	32.135628381110955
+	32.83509850795626

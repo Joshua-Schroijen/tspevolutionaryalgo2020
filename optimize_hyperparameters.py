@@ -8,12 +8,14 @@ import r0486848
 
 
 def evaluate_combination(tsps, current_combination):
+    print(f'Running EA in process with PID {os.getpid()}')
     ea = r0486848.r0486848()
     ea.set_parameters(*current_combination)
     
     return statistics.mean([ea.optimize(tsp)[0] for tsp in tsps])
 
 if __name__ == '__main__':
+    print(f'Starting hyperparameter optimization. PID = {os.getpid()}')
     np.random.seed(0)
 
     no_vertices = 140
