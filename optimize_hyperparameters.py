@@ -6,7 +6,16 @@ import timeit
 
 import r0486848
 
-
+def get_remaining_time_string(seconds):
+    no_days = seconds // 86400
+    seconds -= no_days * 86400
+    no_hours = seconds // 3600
+    seconds -= no_hours * 3600
+    no_minutes = seconds // 60
+    seconds -= no_minutes * 60
+    
+    return "{no_days} days, {no_hours} hours, {no_minutes} minutes & {seconds} seconds"
+    
 def evaluate_combination(tsps, current_combination):
     print(f'Running EA in process with PID {os.getpid()}')
     ea = r0486848.r0486848()
@@ -25,7 +34,7 @@ if __name__ == '__main__':
     population_generation_schemes = [r0486848.PopulationGenerationScheme.RANDOM, r0486848.PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED]
     recombination_operators = [r0486848.RecombinationOperator.HGREX, r0486848.RecombinationOperator.PMX]
     elimination_schemes = [r0486848.EliminationScheme.LAMBDA_MU, r0486848.EliminationScheme.LAMBDAPLUSMU, r0486848.EliminationScheme.LAMBDAPLUSMU_WCROWDING]
-    no_islands = [1, 2, 4, 5, 7, 10]
+    no_islands = [7, 10]
     island_swap_rates = [1, 3, 6]
     island_no_swapped_individuals = [1, 2, 4, 8]
     population_size_factors = [2, 3, 4, 5, 6]
@@ -57,7 +66,7 @@ if __name__ == '__main__':
             res = p.apply_async(evaluate_combination, [tsps, current_combination])
             try:
                 current_combination_average = res.get(1000)
-            except multiprocessing.TimeoutError:
+            except (multiprocessing.TimeoutError, ArithmeticError):
                 current_combination_average = float('inf')
 
         output_file.write(f'Current combination =\n\t{current_combination}\nCurrent combination average =\n\t{current_combination_average}\n')
@@ -88,7 +97,7 @@ if __name__ == '__main__':
             moving_average_time_per_combination += (elapsed / (i + 1))
     
         estimated_time_left = (no_combinations - (i + 1)) * moving_average_time_per_combination
-        print(f'Estimated time until finished: {estimated_time_left} seconds')
+        print(f'Estimated time until finished: {get_remaining_time_string(estimated_time_left)}')
 
     output_file.write('-' * 50 + '\n')
     print('-' * 50)
