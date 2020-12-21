@@ -14,7 +14,7 @@ def get_remaining_time_string(seconds):
     no_minutes = seconds // 60
     seconds -= no_minutes * 60
     
-    return "{no_days} days, {no_hours} hours, {no_minutes} minutes & {seconds} seconds"
+    return f"{no_days} days, {no_hours} hours, {no_minutes} minutes & {seconds} seconds"
     
 def evaluate_combination(tsps, current_combination):
     print(f'Running EA in process with PID {os.getpid()}')

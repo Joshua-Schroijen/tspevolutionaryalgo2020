@@ -1,0 +1,791 @@
+--------------------------------------------------
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 8, 4, 14, 56, 56, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	23.062338853241403
+Current combination new best? YES
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 6, 8, 2, 7, 28, 28, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	51.82443345622656
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 1, 4, 20, 80, 80, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	25.521408264881916
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 1, 2, 7, 28, 28, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	3.4821432811307824
+Current combination new best? YES
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 6, 4, 2, 10, 40, 40, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	32.795844431177365
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 6, 1, 3, 15, 60, 60, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	29.424095967229995
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 1, 4, 14, 56, 56, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	34.972593764532384
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 8, 2, 7, 28, 28, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	19.794972505595187
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 1, 8, 4, 14, 56, 56, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	33.52760405371755
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 6, 1, 5, 17, 70, 70, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	29.771150481797573
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 4, 3, 15, 60, 60, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	3.229758992568466
+Current combination new best? YES
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 4, 2, 7, 28, 28, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	15.528659330060837
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 4, 3, 10, 42, 42, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	3.351975722960029
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 4, 3, 15, 60, 60, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	34.9234860585961
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 8, 6, 30, 120, 120, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	36.03752095318194
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 8, 4, 20, 80, 80, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	19.945830639896908
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 10, 3, 2, 5, 17, 70, 70, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	37.44380303228859
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 8, 2, 10, 40, 40, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	16.54899230643355
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 1, 4, 2, 10, 40, 40, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	50.03713209741781
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 8, 5, 17, 70, 70, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	52.560224986545634
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 3, 2, 5, 17, 70, 70, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	31.8712323878269
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 8, 5, 17, 70, 70, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	52.80492194874033
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 6, 1, 3, 15, 60, 60, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	29.097240969896504
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 10, 3, 4, 2, 7, 28, 28, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	51.84299700947733
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 2, 6, 30, 120, 120, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	31.859068067734842
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 8, 2, 10, 40, 40, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	7.73739468171632
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 3, 2, 4, 14, 56, 56, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	25.46274678856256
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 3, 4, 4, 14, 56, 56, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	13.205488178066801
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 6, 4, 2, 10, 40, 40, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	3.87128931461455
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 1, 6, 21, 84, 84, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	32.68718866327799
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 6, 2, 3, 15, 60, 60, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	52.07253437710103
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 3, 1, 3, 10, 42, 42, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	32.25218961882999
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 6, 1, 4, 20, 80, 80, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	23.199444831196903
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 4, 6, 21, 84, 84, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	49.953566794208015
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 2, 6, 21, 84, 84, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	36.195951645726275
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 2, 2, 7, 28, 28, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	12.614447816626695
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 6, 8, 4, 20, 80, 80, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	49.21200488659523
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 3, 8, 2, 10, 40, 40, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	2.8051282811977374
+Current combination new best? YES
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 3, 8, 4, 14, 56, 56, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	33.06731394761584
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 3, 4, 5, 17, 70, 70, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	53.39980665694253
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 1, 1, 3, 10, 42, 42, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	17.31747205233342
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 6, 1, 3, 10, 42, 42, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	34.99538316380642
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 4, 5, 25, 100, 100, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	49.34101933817277
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 6, 1, 5, 25, 100, 100, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	34.78120651847322
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 2, 4, 14, 56, 56, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	33.626587983619466
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 4, 5, 17, 70, 70, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	3.4093880451495027
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 2, 3, 10, 42, 42, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	35.06008073755675
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 1, 3, 15, 60, 60, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	49.29723681377326
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 2, 5, 17, 70, 70, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	31.803627872924444
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 8, 5, 25, 100, 100, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	3.4093880451495027
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 3, 1, 5, 25, 100, 100, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	3.36249468681913
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 3, 4, 3, 15, 60, 60, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	2.981757973047508
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 1, 5, 17, 70, 70, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	32.805430876082845
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 4, 3, 15, 60, 60, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	14.679355271730909
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 1, 2, 3, 10, 42, 42, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	17.74603241575952
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 2, 5, 25, 100, 100, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	51.10983278128178
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 3, 1, 5, 17, 70, 70, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	38.35834392061949
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 1, 4, 5, 17, 70, 70, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	21.784833757652866
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 6, 2, 4, 20, 80, 80, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	52.4790344855886
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 1, 4, 14, 56, 56, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	32.0881171045171
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 2, 6, 21, 84, 84, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	32.60948561767031
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 8, 5, 17, 70, 70, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	3.4093880451495027
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 3, 1, 2, 7, 28, 28, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	32.54731221173146
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 4, 4, 20, 80, 80, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	3.599282720094324
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 8, 6, 30, 120, 120, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	28.135218404542023
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 2, 5, 17, 70, 70, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	26.283267616440895
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 6, 1, 2, 10, 40, 40, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	26.342061493152332
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 8, 2, 10, 40, 40, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	3.4093880451495027
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 6, 1, 3, 15, 60, 60, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	28.49742756260375
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 6, 1, 3, 10, 42, 42, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	22.995278426961736
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 6, 2, 6, 30, 120, 120, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	31.496896788207785
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 2, 4, 14, 56, 56, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	23.57475428320469
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 4, 6, 30, 120, 120, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	18.916487652996334
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 2, 3, 10, 42, 42, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	35.47276264685314
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 2, 6, 30, 120, 120, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	12.567656882478389
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 3, 4, 5, 17, 70, 70, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	53.99533481057028
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 1, 2, 10, 40, 40, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	13.716240379876984
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 1, 4, 6, 21, 84, 84, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	33.31146417323226
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 2, 5, 17, 70, 70, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	14.478132669380532
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 2, 3, 15, 60, 60, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	31.864630306355405
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 6, 8, 5, 25, 100, 100, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	31.355390594619983
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 8, 3, 15, 60, 60, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	13.528917305056574
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 2, 2, 10, 40, 40, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	49.62259852116359
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 3, 4, 4, 20, 80, 80, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	3.4093880451495027
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 6, 4, 4, 20, 80, 80, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	34.05665985418182
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 2, 2, 10, 40, 40, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	21.572599755055354
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 1, 5, 17, 70, 70, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	4.185831183335315
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 4, 4, 20, 80, 80, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	49.37530169177809
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 1, 6, 21, 84, 84, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	35.622545455638594
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 4, 2, 10, 40, 40, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	51.08418678331412
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 4, 6, 30, 120, 120, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	23.56137285229758
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 6, 1, 6, 21, 84, 84, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	36.42542499871775
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 8, 3, 15, 60, 60, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	31.791979901661275
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 4, 4, 14, 56, 56, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	33.11295061512854
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 4, 3, 10, 42, 42, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	35.13924481456709
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 6, 2, 5, 17, 70, 70, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	28.73244721965564
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 6, 4, 6, 21, 84, 84, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	55.3948262547798
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 6, 4, 4, 20, 80, 80, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	34.39893882909128
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 1, 3, 15, 60, 60, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	50.9062156945196
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 3, 2, 6, 30, 120, 120, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	32.4603155066061
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 8, 3, 10, 42, 42, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	3.316837538618313
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 4, 4, 14, 56, 56, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	19.33643139799283
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 3, 1, 5, 25, 100, 100, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	34.06589364967657
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 8, 3, 15, 60, 60, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	34.758403085346586
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 8, 2, 10, 40, 40, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	3.0850426107533098
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 6, 4, 3, 10, 42, 42, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	52.496844748381385
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 4, 5, 25, 100, 100, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	11.118933871482632
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 8, 2, 7, 28, 28, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	51.04600051264384
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 8, 5, 17, 70, 70, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	31.693284547001745
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 2, 6, 30, 120, 120, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	34.33417506799368
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 1, 8, 4, 14, 56, 56, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	17.792572846788076
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 4, 5, 25, 100, 100, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	53.300166191428886
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 2, 5, 17, 70, 70, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	37.85120184348592
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 1, 5, 25, 100, 100, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	36.029686360425686
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 1, 2, 7, 28, 28, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	35.26583417814316
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 1, 4, 20, 80, 80, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	12.037333415735237
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 2, 3, 10, 42, 42, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	49.95142144816101
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 1, 1, 6, 30, 120, 120, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	25.110194735051905
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 8, 3, 10, 42, 42, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	22.080311866049048
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 6, 8, 4, 20, 80, 80, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	52.37331861931361
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 4, 6, 21, 84, 84, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	3.4093880451495027
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 3, 2, 6, 21, 84, 84, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	26.238384505352382
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 6, 1, 2, 10, 40, 40, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	15.027801431343427
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 3, 1, 2, 10, 40, 40, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	24.213917017768004
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 8, 6, 30, 120, 120, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	31.5998519268429
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 2, 3, 10, 42, 42, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	33.39982051620395
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 3, 1, 3, 10, 42, 42, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	33.107519583683086
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 10, 1, 1, 6, 21, 84, 84, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	36.65925141209178
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 2, 3, 10, 42, 42, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	50.743048985806595
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 6, 2, 3, 15, 60, 60, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	18.553066754543856
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 3, 4, 3, 15, 60, 60, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	19.02799279464705
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 8, 4, 20, 80, 80, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	3.4093880451495027
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 1, 1, 4, 14, 56, 56, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	32.782089683348836
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 3, 4, 6, 21, 84, 84, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	3.3242966326199457
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 8, 2, 7, 28, 28, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	24.70432877717113
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 1, 1, 3, 15, 60, 60, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	34.900193538997975
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 6, 8, 4, 20, 80, 80, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	34.647978435548396
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 8, 2, 7, 28, 28, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	19.795158687277446
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 3, 8, 3, 10, 42, 42, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	18.587416948357173
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 1, 5, 17, 70, 70, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	49.95516042223648
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 3, 4, 4, 14, 56, 56, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	53.140662818116624
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 8, 2, 10, 40, 40, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	49.532679009289055
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 10, 6, 2, 2, 7, 28, 28, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	31.7811641371854
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 1, 8, 5, 25, 100, 100, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	21.197259321485827
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 1, 2, 7, 28, 28, 0.1, False, True, 0.001, 3, False)
+Current combination average =
+	15.401352899457486
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 1, 4, 3, 15, 60, 60, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	3.4093880451495027
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 7, 6, 2, 5, 25, 100, 100, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	51.92909334643366
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 6, 1, 6, 30, 120, 120, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	27.243535853299107
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDA_MU: 3>, 10, 3, 2, 4, 14, 56, 56, 0.1, False, False, 0.001, 3, False)
+Current combination average =
+	33.72933499885487
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 3, 4, 6, 21, 84, 84, 0.1, True, False, 0.001, 3, False)
+Current combination average =
+	49.66355106510311
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 3, 1, 4, 14, 56, 56, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	53.64585359114761
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 8, 5, 17, 70, 70, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	43.725172255725596
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 1, 2, 2, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
+Current combination average =
+	50.747431046279154
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 10, 1, 4, 5, 17, 70, 70, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	36.27081913692156
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU_WCROWDING: 2>, 7, 3, 1, 4, 20, 80, 80, 0.05, True, True, 0.001, 3, False)
+Current combination average =
+	54.43947981885613
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 7, 6, 2, 6, 30, 120, 120, 0.05, True, False, 0.001, 3, False)
+Current combination average =
+	34.35914984446915
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 6, 8, 5, 17, 70, 70, 0.1, True, True, 0.001, 3, False)
+Current combination average =
+	3.2909370934502222
+Current combination new best? NO
+Current combination =
+	(<PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: 2>, <RecombinationOperator.PMX: 1>, <EliminationScheme.LAMBDAPLUSMU: 1>, 10, 3, 2, 6, 21, 84, 84, 0.05, False, True, 0.001, 3, False)
+Current combination average =
+	3.229758992568466
+Current combination new best? NO
