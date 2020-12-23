@@ -76,7 +76,7 @@ class r0486848:
         self._optimize = self.optimize
         self._tsp = None
 
-        self.set_parameters(population_generation_scheme = PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED, recombination_operator = RecombinationOperator.HGREX, elimination_scheme = EliminationScheme.LAMBDA_MU, no_islands = 5, island_swap_rate = 3, island_no_swapped_individuals = 3, population_size_factor = 2, default_k = 14, mu = 58, no_individuals_to_keep = 58, default_mutation_chance = 0.05, mutation_chance_feedback = False, mutation_chance_self_adaptivity = True, stopping_ratio = 0.001, tolerances = 3, provide_analytics = True)
+        self._parameters_set = False
         
     def set_parameters(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, population_size_factor, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances, provide_analytics):
         """
@@ -123,6 +123,8 @@ class r0486848:
         else:
             self.optimize = self._optimize
 
+        self._parameters_set = True
+
     def optimize(self, source, verbose=False):   
         if verbose == True: print("Starting evolutionary algorithm ...", flush=True)
         # Start timer for assessing optimization speed
@@ -139,6 +141,9 @@ class r0486848:
             # Set up TSP instance representation
             self._tsp = TSP(distanceMatrix)
         
+        if self._parameters_set == False:
+            self.set_parameters(population_generation_scheme = PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED, recombination_operator = RecombinationOperator.HGREX, elimination_scheme = EliminationScheme.LAMBDAPLUSMU, no_islands = 7, island_swap_rate = 3, island_no_swapped_individuals = 8, population_size_factor = 3, default_k = int((self._tsp.no_vertices * 3) / (7 * 4)), mu = int((self._tsp.no_vertices * 3) / 7), no_individuals_to_keep = int((self._tsp.no_vertices * 3) / 7), default_mutation_chance = 0.1, mutation_chance_feedback = False, mutation_chance_self_adaptivity = False, stopping_ratio = 0.001, tolerances = 3, provide_analytics = False)
+
         self._initial_population_size = self._population_size_factor * self._tsp.no_vertices
         
         # Report TSP instance heuristic benchmark performance
