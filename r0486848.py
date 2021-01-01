@@ -1,4 +1,5 @@
 import math
+import random
 import statistics
 import collections
 import itertools
@@ -972,10 +973,12 @@ class Population:
         file.close()
 
     def get_subpopulations(self, m, return_rest = False):
-        e = int((len(self._individuals) - (len(self._individuals) % m)) / m)
-        sublists = [self._individuals[(i * e):((i + 1) * e)] for i in range(m)]
+        shuffled_individuals = self._individuals.copy()
+        random.shuffle(shuffled_individuals)
+        e = int((len(shuffled_individuals) - (len(shuffled_individuals) % m)) / m)
+        sublists = [shuffled_individuals[(i * e):((i + 1) * e)] for i in range(m)]
         if return_rest == True:
-            sublists.append(self._individuals[(len(self._individuals) - (len(self._individuals) % m)):])
+            sublists.append(shuffled_individuals[(len(shuffled_individuals) - (len(shuffled_individuals) % m)):])
         return [Population(sublist, self._no_vertices) for sublist in sublists]
     
     @property
