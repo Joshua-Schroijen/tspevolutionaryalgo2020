@@ -789,7 +789,11 @@ class TSP:
         :return: the mean total length of the tours represented by the individuals
         """
         if filter_infeasibles:
-            return statistics.mean(list(filter(lambda x: not np.isinf(x),[self.fitness(individual) for individual in individuals])))
+            filtered_fitnesses = list(filter(lambda x: not np.isinf(x),[self.fitness(individual) for individual in individuals]))
+            if len(filtered_fitnesses) != 0:
+                return statistics.mean(filtered_fitnesses)
+            else:
+                return math.inf
         else:
             return statistics.mean([self.fitness(individual) for individual in individuals])
 
