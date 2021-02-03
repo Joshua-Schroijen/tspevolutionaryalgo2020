@@ -6,3 +6,7 @@ r0486848_last_distribution.png
 r0486848_stdev_distances.png
 algorithm_profile.txt
 r0486848_last_population.txt
+r0486848.log
+stresstest.log
+optimize_hyperparameters.log
+compare_parameters.log
