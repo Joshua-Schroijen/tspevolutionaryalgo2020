@@ -7,7 +7,7 @@ import logging
 import timeit
 import cProfile, pstats
 import sys
-import concurrent.futures
+import multiprocessing
 import numpy as np
 import matplotlib.pyplot as plt
 import Reporter
@@ -177,16 +177,16 @@ class r0486848:
         if self._provide_analytics == True: mean_distances_to_others = [complete_initial_population.get_mean_distance_to_others()]
         
         evolutionary_algorithms = [self.__get_EA(subpopulation) for subpopulation in initial_subpopulations]
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with multiprocessing.Pool() as executor_pool:
             while(any([not ea.converged for ea in evolutionary_algorithms])):
                 if ( iteration_number % self._island_swap_rate ) == 0:
                     pairs = _get_pairs_cycle(evolutionary_algorithms)
                     for pair in pairs:
                         pair[0].swap_individuals_with(pair[1], self._island_no_swapped_individuals)
 
-                current_subpopulation_futures = [executor.submit(ea.run_iteration) for ea in evolutionary_algorithms]
+                current_subpopulation_asyncresults = [executor_pool.apply_async(ea.run_iteration) for ea in evolutionary_algorithms]
                 
-                current_population = Population([individual for current_subpopulation_future in current_subpopulation_futures for individual in current_subpopulation_future.result()], self._tsp.no_vertices)
+                current_population = Population([individual for current_subpopulation_asyncresult in current_subpopulation_asyncresults for individual in current_subpopulation_asyncresult.get()], self._tsp.no_vertices)
                 
                 current_mean_fitness = self._tsp.mean_fitness(current_population.individuals, True)
                 current_best_fitness = self._tsp.best_fitness(current_population.individuals)
@@ -319,30 +319,12 @@ class r0486848:
         
         :return: a Population object containing the generated initial population
         """
-        def add_individuals_for(vertex):
-            nn_solution = self.__get_nearest_neighbour_solution(vertex)
-            # Add the nearest neighbour solution starting at the given vertex to the population
-            starting_individuals[vertex] = nn_solution
-
-            for i in range(self._population_size_factor - 1):
-                permutation = nn_solution.permutation
-                # Sample the number of random swaps from a λ/4 - Poisson distribution
-                # This way we will get a lot of desired variation, but we mostly won't jump too far away from probably-good solutions
-                no_random_swaps = max(1, min(np.random.poisson(math.floor(self._initial_population_size / 4)), self._initial_population_size))
-                
-                # Execute the random swaps
-                for _ in range(no_random_swaps):
-                    a = np.random.randint(0, self._tsp.no_vertices)
-                    b = np.random.randint(0, self._tsp.no_vertices)
-                    permutation = _get_swapped(permutation, a, b)
-
-                # Add the new, mutated version of the nearest neighbour solution to the population
-                starting_individuals[self._tsp.no_vertices + (vertex * (self._population_size_factor - 1 )) + i] = Individual(permutation, self._default_mutation_chance)
-
-        starting_individuals = int(self._initial_population_size) * [0]
+        starting_individuals = []
         # Add the individuals for each vertex to the population (in parallel)
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            concurrent.futures.wait([executor.submit(add_individuals_for, vertex) for vertex in range(self._tsp.no_vertices)])
+        with multiprocessing.Pool() as executor_pool:
+            individuals_lists = [asyncresult.get() for asyncresult in [executor_pool.apply_async(self._generate_initial_nn_individuals_for, [vertex]) for vertex in range(self._tsp.no_vertices)]]
+            for individuals_list in individuals_lists:
+                starting_individuals.extend(individuals_list)
 
         # Return the generated initial population
         return(Population(starting_individuals, self._tsp.no_vertices))
@@ -399,6 +381,30 @@ class r0486848:
                 next_vertex = np.argmin(edge_weights)
         
         return Individual(nn_solution, self._default_mutation_chance)
+
+    def _generate_initial_nn_individuals_for(self, vertex):
+        individuals = int(self._population_size_factor) * [0]
+         
+        nn_solution = self.__get_nearest_neighbour_solution(vertex)
+        # Add the nearest neighbour solution starting at the given vertex to the population
+        individuals[0] = nn_solution
+
+        for i in range(self._population_size_factor - 1):
+            permutation = nn_solution.permutation
+            # Sample the number of random swaps from a λ/4 - Poisson distribution
+            # This way we will get a lot of desired variation, but we mostly won't jump too far away from probably-good solutions
+            no_random_swaps = max(1, min(np.random.poisson(math.floor(self._initial_population_size / 4)), self._initial_population_size))
+                
+            # Execute the random swaps
+            for _ in range(no_random_swaps):
+                a = np.random.randint(0, self._tsp.no_vertices)
+                b = np.random.randint(0, self._tsp.no_vertices)
+                permutation = _get_swapped(permutation, a, b)
+
+            # Add the new, mutated version of the nearest neighbour solution to the population
+            individuals[(i + 1)] = Individual(permutation, self._default_mutation_chance)
+
+        return individuals
 
 class EvolutionaryAlgorithm:
     """
