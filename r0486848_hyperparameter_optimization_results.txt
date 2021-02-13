@@ -1,16 +1,16 @@
 --------------------------------------------------
 Current combination =
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 10, 1, 1, 2, 7, 28, 28, 0.05, False, False, 0.001, 3, False)
+	(<r0486848.PopulationGenerationSettings object at 0x0000020FF83878B0>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 15, 60, 60, 0.05, False, False, 0.001, 3, False)
 Current combination average =
-	33.00737437123538
+	45.78294463370297
 Current combination new best? YES
 Current combination =
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
+	(<r0486848.PopulationGenerationSettings object at 0x0000020FF8387C70>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
 Current combination average =
-	32.02387501631508
-Current combination new best? YES
+	46.711381283914235
+Current combination new best? NO
 --------------------------------------------------
 Best combination was
-	(<PopulationGenerationScheme.RANDOM: 1>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 2, 10, 40, 40, 0.05, False, False, 0.001, 3, False)
+	(<r0486848.PopulationGenerationSettings object at 0x0000020FF83878B0>, <RecombinationOperator.HGREX: 2>, <EliminationScheme.LAMBDA_MU: 3>, 7, 1, 1, 15, 60, 60, 0.05, False, False, 0.001, 3, False)
 Best combination average was
-	32.02387501631508
+	45.78294463370297

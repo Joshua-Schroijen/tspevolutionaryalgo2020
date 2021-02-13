@@ -1,3 +1,4 @@
+import concurrent.futures
 import multiprocessing
 import queue
 import numpy as np
@@ -71,13 +72,12 @@ if __name__ == '__main__':
     
         tsps = [r0486848.TSP.get_random(no_vertices) for _ in range(3)]
 
-        population_generation_schemes = [r0486848.PopulationGenerationScheme.RANDOM, r0486848.PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED]
+        population_generation_settings = [r0486848.PopulationGenerationSettings(no_vertices * 2, 0, 0), r0486848.PopulationGenerationSettings(no_vertices * 3, 0, 0), r0486848.PopulationGenerationSettings(no_vertices * 4, 0, 0), r0486848.PopulationGenerationSettings(no_vertices * 5, 0, 0), r0486848.PopulationGenerationSettings(no_vertices * 6, 0, 0), r0486848.PopulationGenerationSettings(0, no_vertices, 2), r0486848.PopulationGenerationSettings(0, no_vertices, 3), r0486848.PopulationGenerationSettings(0, no_vertices, 4), r0486848.PopulationGenerationSettings(0, no_vertices, 5), r0486848.PopulationGenerationSettings(0, no_vertices, 6)]
         recombination_operators = [r0486848.RecombinationOperator.HGREX, r0486848.RecombinationOperator.PMX]
         elimination_schemes = [r0486848.EliminationScheme.LAMBDA_MU, r0486848.EliminationScheme.LAMBDAPLUSMU, r0486848.EliminationScheme.LAMBDAPLUSMU_WCROWDING]
         no_islands = [7, 10]
         island_swap_rates = [1, 3, 6]
         island_no_swapped_individuals = [1, 2, 4, 8]
-        population_size_factors = [2, 3, 4, 5, 6]
         default_mutation_chances = [0.05, 0.10]
         mutation_chance_feedbacks = [False, True]
         mutation_chance_self_adaptivities = [False, True]
@@ -88,7 +88,7 @@ if __name__ == '__main__':
         output_file.write('-' * 50 + '\n')
         logger.info('-' * 50)
 
-        combinations = {i : c for i, c in enumerate(r0486848.Combinations(population_generation_schemes, recombination_operators, elimination_schemes, no_islands, island_swap_rates, island_no_swapped_individuals, population_size_factors, default_mutation_chances, mutation_chance_feedbacks, mutation_chance_self_adaptivities))}
+        combinations = {i : c for i, c in enumerate(r0486848.Combinations(population_generation_settings, recombination_operators, elimination_schemes, no_islands, island_swap_rates, island_no_swapped_individuals, default_mutation_chances, mutation_chance_feedbacks, mutation_chance_self_adaptivities))}
         no_combinations = len(combinations)
         moving_average_time_per_combination = 0
 
@@ -97,14 +97,14 @@ if __name__ == '__main__':
 
             combination_choice_key = np.random.choice(list(combinations.keys()), 1)[0]
             chosen_combination = combinations[combination_choice_key]
-            current_combination = chosen_combination[0:7] + (int((chosen_combination[6] * no_vertices ) / (4 * chosen_combination[3])), int((chosen_combination[6] * no_vertices ) / chosen_combination[3]), int((chosen_combination[6] * no_vertices ) / chosen_combination[3])) + chosen_combination[7:] + (0.001, 3, False)
+            current_combination = chosen_combination[0:6] + (int(chosen_combination[0].total_population_size / (4 * chosen_combination[3])), int(chosen_combination[0].total_population_size / chosen_combination[3]), int(chosen_combination[0].total_population_size / chosen_combination[3])) + chosen_combination[6:] + (0.001, 3, False)
             del combinations[combination_choice_key]
 
-            with multiprocessing.Pool(initializer=evaluate_combination_init, initargs=(logging_queue,)) as p:
-                res = p.apply_async(evaluate_combination, [tsps, current_combination])
+            with concurrent.futures.ProcessPoolExecutor(initializer=evaluate_combination_init, initargs=(logging_queue,)) as p:
+                res = p.submit(evaluate_combination, tsps, current_combination)
                 try:
-                    current_combination_average = res.get(1000)
-                except (multiprocessing.TimeoutError, ArithmeticError):
+                    current_combination_average = res.result(1000)
+                except (concurrent.futures.TimeoutError, ArithmeticError):
                     current_combination_average = float('inf')
 
             output_file.write(f'Current combination =\n\t{current_combination}\nCurrent combination average =\n\t{current_combination_average}\n')

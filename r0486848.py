@@ -62,6 +62,28 @@ class PopulationGenerationScheme(Enum):
     RANDOM                  = 1
     NEAREST_NEIGHBOUR_BASED = 2
 
+class PopulationGenerationSettings:
+    def __init__(self, no_random_indvs, no_base_nn_indvs, no_derived_nn_indvs):
+        self._no_random_individuals = no_random_indvs
+        self._no_base_nearest_neighbour_individuals = no_base_nn_indvs
+        self._no_derived_nearest_neighbour_individuals = no_derived_nn_indvs
+
+    @property
+    def no_random_individuals(self):
+        return self._no_random_individuals
+    
+    @property
+    def no_base_nearest_neighbour_individuals(self):
+        return self._no_base_nearest_neighbour_individuals
+        
+    @property
+    def no_derived_nearest_neighbour_individuals(self):
+        return self._no_derived_nearest_neighbour_individuals
+    
+    @property
+    def total_population_size(self):
+        return self._no_random_individuals + self._no_base_nearest_neighbour_individuals + self._no_derived_nearest_neighbour_individuals
+
 class RecombinationOperator(Enum):
     PMX   = 1
     HGREX = 2
@@ -87,15 +109,14 @@ class r0486848:
 
         self._parameters_set = False
         
-    def set_parameters(self, population_generation_scheme, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, population_size_factor, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances, provide_analytics):
+    def set_parameters(self, population_generation_settings, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances, provide_analytics):
         """
         Sets the evolutionary algorithm's parameters
         
-        :param population_generation_scheme: the population generation scheme
+        :param population_generation_settings: the population generation settings (how many individuals to generate through different schemes)
         :param reombination_operator: the recombination operator to use
         :param elimination_scheme: the elimination scheme
         :param no_islands: the number of islands to use (this evolutionary algorithm uses the island model)
-        :param population_size_factor: population size is number of vertices in problem * this parameter
         :param default_k: default tournament size for k-tournament selection
         :param mu: number of offspring to generate from the population
         :param no_individuals_to_keep: number of individuals to keep in elimination steps
@@ -107,16 +128,12 @@ class r0486848:
         :return: an initialized evolutionary algorithm object of class r0486848
         """
         # Copy given evolutionary algorithm parameters to attributes
-        self._get_initial_population = {
-            PopulationGenerationScheme.RANDOM: self._get_random_initial_population,
-            PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED: self._get_nearest_neighbour_based_initial_population
-        }[population_generation_scheme]
+        self._population_generation_settings = population_generation_settings
         self._recombination_operator = recombination_operator
         self._elimination_scheme = elimination_scheme
         self._no_islands = no_islands
         self._island_swap_rate = island_swap_rate
         self._island_no_swapped_individuals = island_no_swapped_individuals
-        self._population_size_factor = population_size_factor
         self._default_k = default_k
         self._mu = mu
         self._no_individuals_to_keep = no_individuals_to_keep
@@ -152,9 +169,7 @@ class r0486848:
             self._tsp = TSP(distanceMatrix)
         
         if self._parameters_set == False:
-            self.set_parameters(population_generation_scheme = PopulationGenerationScheme.NEAREST_NEIGHBOUR_BASED, recombination_operator = RecombinationOperator.HGREX, elimination_scheme = EliminationScheme.LAMBDAPLUSMU, no_islands = 7, island_swap_rate = 3, island_no_swapped_individuals = 8, population_size_factor = 3, default_k = int((self._tsp.no_vertices * 3) / (7 * 4)), mu = int((self._tsp.no_vertices * 3) / 7), no_individuals_to_keep = int((self._tsp.no_vertices * 3) / 7), default_mutation_chance = 0.1, mutation_chance_feedback = False, mutation_chance_self_adaptivity = False, stopping_ratio = 0.001, tolerances = 3, provide_analytics = False)
-
-        self._initial_population_size = self._population_size_factor * self._tsp.no_vertices
+            self.set_parameters(population_generation_settings = PopulationGenerationSettings(0, self._tsp.no_vertices, 3), recombination_operator = RecombinationOperator.HGREX, elimination_scheme = EliminationScheme.LAMBDAPLUSMU, no_islands = 7, island_swap_rate = 3, island_no_swapped_individuals = 8, default_k = int((self._tsp.no_vertices * 3) / (7 * 4)), mu = int((self._tsp.no_vertices * 3) / 7), no_individuals_to_keep = int((self._tsp.no_vertices * 3) / 7), default_mutation_chance = 0.1, mutation_chance_feedback = False, mutation_chance_self_adaptivity = False, stopping_ratio = 0.001, tolerances = 3, provide_analytics = False)
         
         # Report TSP instance heuristic benchmark performance
         nn_mean_fitness, nn_best_fitness = self._get_benchmarks()
@@ -187,7 +202,7 @@ class r0486848:
                 current_subpopulation_asyncresults = [executor_pool.apply_async(ea.run_iteration) for ea in evolutionary_algorithms]
                 
                 current_population = Population([individual for current_subpopulation_asyncresult in current_subpopulation_asyncresults for individual in current_subpopulation_asyncresult.get()], self._tsp.no_vertices)
-                
+
                 current_mean_fitness = self._tsp.mean_fitness(current_population.individuals, True)
                 current_best_fitness = self._tsp.best_fitness(current_population.individuals)
                 no_converged_algorithms = sum(1 for ea in evolutionary_algorithms if ea.converged)
@@ -304,30 +319,41 @@ class r0486848:
         # Return the mean and best fitness of the set of nearest neighbour solutions at each possible starting vertex
         return (self._tsp.mean_fitness(nn_individuals, True), self._tsp.best_fitness(nn_individuals))
 
-    def _get_random_initial_population(self):
+    def _get_initial_population(self):
         """
-        Creates a population by generating population_size_factor * number of cities random permutations
+        Creates a population based on the population generation settings
         
         :return: a Population object containing the generated initial population
         """
-        return(Population([Individual(np.random.permutation(self._tsp.no_vertices)) for _ in range(int(self._initial_population_size))], self._tsp.no_vertices))
+        individuals = []
+        individuals.extend(self._get_random_initial_individuals(self._population_generation_settings.no_random_individuals))
+        individuals.extend(self._get_nearest_neighbour_based_initial_individuals(self._population_generation_settings.no_base_nearest_neighbour_individuals, self._population_generation_settings.no_derived_nearest_neighbour_individuals))
+        return Population(individuals, self._tsp.no_vertices)
 
-    def _get_nearest_neighbour_based_initial_population(self):
+    def _get_random_initial_individuals(self, no_random_individuals):
         """
-        Creates a population by taking the set of nearest neighbour solutions starting at each possible vertex and
-        extending it with (population_size_factor - 1) randomly swap mutated versions of each member
+        Generates no_random_individuals completely random individuals for an initial population
         
-        :return: a Population object containing the generated initial population
+        :return: a list of the generated completely random individuals
+        """
+        return [Individual(np.random.permutation(self._tsp.no_vertices)) for _ in range(no_random_individuals)]
+
+    def _get_nearest_neighbour_based_initial_individuals(self, no_base_nearest_neighbour_individuals, no_derived_nearest_neighbour_individuals):
+        """
+        Generates individuals by taking no_base_nearest_neighbour_individuals nearest neighbour solutions and
+        extending them with no_derived_nearest_neighbour_individuals randomly swap mutated versions of them
+        
+        :return: a list of nearest neighbour based initial individuals
         """
         starting_individuals = []
-        # Add the individuals for each vertex to the population (in parallel)
+        # Add the individuals for each vertex to the list (in parallel)
         with multiprocessing.Pool() as executor_pool:
-            individuals_lists = [asyncresult.get() for asyncresult in [executor_pool.apply_async(self._generate_initial_nn_individuals_for, [vertex]) for vertex in range(self._tsp.no_vertices)]]
+            individuals_lists = [asyncresult.get() for asyncresult in [executor_pool.apply_async(self._generate_initial_nn_individuals_for, [vertex, no_derived_nearest_neighbour_individuals]) for vertex in np.random.default_rng().choice(self._tsp.no_vertices, size=no_base_nearest_neighbour_individuals, replace=False)]]
             for individuals_list in individuals_lists:
                 starting_individuals.extend(individuals_list)
 
-        # Return the generated initial population
-        return(Population(starting_individuals, self._tsp.no_vertices))
+        # Return the generated initial individuals
+        return starting_individuals
 
     def __get_EA(self, population):
         return EvolutionaryAlgorithm(self._tsp, self._recombination_operator, self._elimination_scheme, self._default_k, True, self._mu, self._no_individuals_to_keep, self._default_mutation_chance, self._mutation_chance_feedback, self._mutation_chance_self_adaptivity, self._stopping_ratio, self._tolerances, population)
@@ -382,18 +408,18 @@ class r0486848:
         
         return Individual(nn_solution, self._default_mutation_chance)
 
-    def _generate_initial_nn_individuals_for(self, vertex):
-        individuals = int(self._population_size_factor) * [0]
+    def _generate_initial_nn_individuals_for(self, vertex, no_derived_nearest_neighbour_individuals):
+        individuals = (no_derived_nearest_neighbour_individuals + 1) * [0]
          
         nn_solution = self.__get_nearest_neighbour_solution(vertex)
-        # Add the nearest neighbour solution starting at the given vertex to the population
+        # Add the nearest neighbour solution starting at the given vertex to the set
         individuals[0] = nn_solution
 
-        for i in range(self._population_size_factor - 1):
+        for i in range(no_derived_nearest_neighbour_individuals):
             permutation = nn_solution.permutation
             # Sample the number of random swaps from a λ/4 - Poisson distribution
             # This way we will get a lot of desired variation, but we mostly won't jump too far away from probably-good solutions
-            no_random_swaps = max(1, min(np.random.poisson(math.floor(self._initial_population_size / 4)), self._initial_population_size))
+            no_random_swaps = max(1, min(np.random.poisson(math.floor(self._population_generation_settings.total_population_size / 4)), self._population_generation_settings.total_population_size))
                 
             # Execute the random swaps
             for _ in range(no_random_swaps):
@@ -401,7 +427,7 @@ class r0486848:
                 b = np.random.randint(0, self._tsp.no_vertices)
                 permutation = _get_swapped(permutation, a, b)
 
-            # Add the new, mutated version of the nearest neighbour solution to the population
+            # Add the new, mutated version of the nearest neighbour solution to the set
             individuals[(i + 1)] = Individual(permutation, self._default_mutation_chance)
 
         return individuals
@@ -467,7 +493,7 @@ class EvolutionaryAlgorithm:
 
         # Create μ offspring of the current population
         offspring = []
-            
+
         while len(offspring) < self._mu:
             # Select two parents
             first_parent = self._selection()
@@ -810,7 +836,7 @@ class TSP:
         :return: the mean total length of the tours represented by the individuals
         """
         if filter_infeasibles:
-            filtered_fitnesses = list(filter(lambda x: not np.isinf(x),[self.fitness(individual) for individual in individuals]))
+            filtered_fitnesses = list(filter(lambda x: not np.isinf(x), [self.fitness(individual) for individual in individuals]))
             if len(filtered_fitnesses) != 0:
                 return statistics.mean(filtered_fitnesses)
             else:
