@@ -180,7 +180,6 @@ class r0486848:
         complete_initial_population = self._get_initial_population()
         if verbose == True:
             logger.info("Initial population generated")
-        initial_subpopulations = complete_initial_population.get_subpopulations(self._no_islands, False)
         
         # Run evolutionary algorith on islands, keeping track of performance
         iteration_number = 1
@@ -189,8 +188,11 @@ class r0486848:
         current_best_fitness = self._tsp.best_fitness(complete_initial_population.individuals)
         mean_fitnesses = [current_mean_fitness]
         best_fitnesses = [current_best_fitness]
-        if self._provide_analytics == True: mean_distances_to_others = [complete_initial_population.get_mean_distance_to_others()]
         
+        self.reporter.report(current_mean_fitness, current_best_fitness, self._tsp.best_individual(complete_initial_population.individuals).permutation)
+        if self._provide_analytics == True: mean_distances_to_others = [complete_initial_population.get_mean_distance_to_others()]
+
+        initial_subpopulations = complete_initial_population.get_subpopulations(self._no_islands, False)
         evolutionary_algorithms = [self.__get_EA(subpopulation) for subpopulation in initial_subpopulations]
         with multiprocessing.Pool() as executor_pool:
             while(any([not ea.converged for ea in evolutionary_algorithms])):
