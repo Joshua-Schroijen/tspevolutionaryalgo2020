@@ -803,9 +803,15 @@ class TSP:
     :attribute no_vertices: the number of vertices (cities) in the problem
     """
     @staticmethod
-    def get_random(no_vertices):
+    def get_random(no_vertices, infinite_edge_chance=0.1):
         distance_matrix = np.random.rand(no_vertices, no_vertices)
-        np.fill_diagonal(distance_matrix, 0)
+        distance_matrix_reshaped = distance_matrix.reshape(no_vertices ** 2)
+        for idx, _ in np.ndenumerate(distance_matrix_reshaped):
+            if (idx[0] % (no_vertices + 1)) == 0:
+                distance_matrix_reshaped[idx] = 0
+            elif np.random.rand() <= infinite_edge_chance:
+                distance_matrix_reshaped[idx] = math.inf
+
         return TSP(distance_matrix)
 
     def __init__(self, distance_matrix):
