@@ -8,5 +8,10 @@ algorithm_profile.txt
 r0486848_last_population.txt
 r0486848.log
 stresstest.log
-optimize_hyperparameters.log
+optimize_hyperparameters_50.log
+optimize_hyperparameters_100.log
+optimize_hyperparameters_150.log
+optimize_hyperparameters_200.log
+optimize_hyperparameters_500.log
+optimize_hyperparameters_1000.log
 compare_parameters.log
