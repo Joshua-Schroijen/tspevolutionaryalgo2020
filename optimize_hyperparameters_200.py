@@ -58,14 +58,14 @@ if __name__ == '__main__':
     logging_queue = multiprocessing.Queue()
     logging_process = multiprocessing.Process(target=logging_process_target, args=(logging_queue, shutdown_event))
     logging_process.start()
-    output_file = open("r0486848_hyperparameter_optimization_results.txt", "w")
+    output_file = open("r0486848_hyperparameter_optimization_results_200.txt", "w")
 
     try:
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.INFO)
         logger.addHandler(logging.handlers.QueueHandler(logging_queue))
 
-        logger.info(f'Starting hyperparameter optimization. PID = {os.getpid()}')
+        logger.info(f'Starting hyperparameter optimization for instance size 200. PID = {os.getpid()}')
         np.random.seed(0)
 
         no_vertices = 140
