@@ -84,6 +84,9 @@ class PopulationGenerationSettings:
     def total_population_size(self):
         return self._no_random_individuals + self._no_base_nearest_neighbour_individuals + self._no_derived_nearest_neighbour_individuals
 
+    def __repr__(self):
+        return f"PopulationGenerationSettings(no_random_indvs = {self._no_random_individuals}, no_base_nn_indvs = {self._no_base_nearest_neighbour_individuals}, no_derived_nn_indvs = {self._no_derived_nearest_neighbour_individuals})"
+
     def __str__(self):
         return f"PopulationGenerationSettings(no_random_indvs = {self._no_random_individuals}, no_base_nn_indvs = {self._no_base_nearest_neighbour_individuals}, no_derived_nn_indvs = {self._no_derived_nearest_neighbour_individuals})"
 
