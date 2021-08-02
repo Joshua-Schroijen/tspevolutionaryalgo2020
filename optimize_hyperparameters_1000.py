@@ -1,4 +1,5 @@
 import concurrent.futures
+import math
 import multiprocessing
 import queue
 import numpy as np
@@ -68,26 +69,19 @@ if __name__ == '__main__':
         logger.info(f'Starting hyperparameter optimization for instance size 1000. PID = {os.getpid()}')
         np.random.seed(0)
 
-        no_vertices = 140
+        no_vertices = 1000
     
         tsps = [r0486848.TSP.get_random(no_vertices) for _ in range(3)]
 
         population_generation_settings = [
-          r0486848.PopulationGenerationSettings(no_vertices * 4, 0, 0),
-          r0486848.PopulationGenerationSettings(no_vertices * 6, 0, 0),
-          r0486848.PopulationGenerationSettings(round((2 * no_vertices ) / 3), round(no_vertices / 3), 4),
-          r0486848.PopulationGenerationSettings(round((2 * no_vertices ) / 3), round(no_vertices / 3), 6),
-          r0486848.PopulationGenerationSettings(round(no_vertices / 2), round(no_vertices / 2), 4),
-          r0486848.PopulationGenerationSettings(round(no_vertices / 2), round(no_vertices / 2), 6),
-          r0486848.PopulationGenerationSettings(round(no_vertices / 3), round((2 * no_vertices ) / 3), 4),
-          r0486848.PopulationGenerationSettings(round(no_vertices / 3), round((2 * no_vertices ) / 3), 6)
+          r0486848.PopulationGenerationSettings(round(no_vertices / 3), 0, 0),
         ]
-        recombination_operators = [r0486848.RecombinationOperator.HGREX, r0486848.RecombinationOperator.PMX]
-        elimination_schemes = [r0486848.EliminationScheme.LAMBDA_MU, r0486848.EliminationScheme.LAMBDAPLUSMU]
-        no_islands = [1, 3, 7, 10, 20]
+        recombination_operators = [r0486848.RecombinationOperator.PMX]
+        elimination_schemes = [r0486848.EliminationScheme.LAMBDA_MU]
+        no_islands = [1, 3]
         island_swap_rates = [1, 3, 6]
-        island_no_swapped_individuals = [1, 2, 4, 8, 16, 32]
-        default_mutation_chances = [0.05, 0.10, 0.25, 0.30, 0.35, 0.40, 0.5]
+        island_no_swapped_individuals = [1, 2, 4]
+        default_mutation_chances = [0.05, 0.10, 0.25]
         mutation_chance_feedbacks = [False, True]
         mutation_chance_self_adaptivities = [False, True]
 
@@ -106,7 +100,7 @@ if __name__ == '__main__':
 
             combination_choice_key = np.random.choice(list(combinations.keys()), 1)[0]
             chosen_combination = combinations[combination_choice_key]
-            current_combination = chosen_combination[0:6] + (int(chosen_combination[0].total_population_size / (4 * chosen_combination[3])), int(chosen_combination[0].total_population_size / chosen_combination[3]), int(chosen_combination[0].total_population_size / chosen_combination[3])) + chosen_combination[6:] + (0.001, 3, False)
+            current_combination = chosen_combination[0:6] + (int(chosen_combination[0].total_population_size / (4 * chosen_combination[3])), int(chosen_combination[0].total_population_size / chosen_combination[3]), int(chosen_combination[0].total_population_size / chosen_combination[3])) + chosen_combination[6:] + (0.001, 3)
             del combinations[combination_choice_key]
 
             with concurrent.futures.ProcessPoolExecutor(initializer=evaluate_combination_init, initargs=(logging_queue,)) as p:

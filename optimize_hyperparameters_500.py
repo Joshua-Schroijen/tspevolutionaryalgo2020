@@ -68,7 +68,7 @@ if __name__ == '__main__':
         logger.info(f'Starting hyperparameter optimization for instance size 500. PID = {os.getpid()}')
         np.random.seed(0)
 
-        no_vertices = 140
+        no_vertices = 500
     
         tsps = [r0486848.TSP.get_random(no_vertices) for _ in range(3)]
 
@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
             combination_choice_key = np.random.choice(list(combinations.keys()), 1)[0]
             chosen_combination = combinations[combination_choice_key]
-            current_combination = chosen_combination[0:6] + (int(chosen_combination[0].total_population_size / (4 * chosen_combination[3])), int(chosen_combination[0].total_population_size / chosen_combination[3]), int(chosen_combination[0].total_population_size / chosen_combination[3])) + chosen_combination[6:] + (0.001, 3, False)
+            current_combination = chosen_combination[0:6] + (int(chosen_combination[0].total_population_size / (4 * chosen_combination[3])), int(chosen_combination[0].total_population_size / chosen_combination[3]), int(chosen_combination[0].total_population_size / chosen_combination[3])) + chosen_combination[6:] + (0.001, 3)
             del combinations[combination_choice_key]
 
             with concurrent.futures.ProcessPoolExecutor(initializer=evaluate_combination_init, initargs=(logging_queue,)) as p:

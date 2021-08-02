@@ -77,13 +77,13 @@ if __name__ == '__main__':
         elimination_schemes = [r0486848.EliminationScheme.LAMBDA_MU, r0486848.EliminationScheme.LAMBDAPLUSMU, r0486848.EliminationScheme.LAMBDAPLUSMU_WCROWDING]
         no_islands = [7, 10]
         island_swap_rates = [1, 3, 6]
-        island_no_swapped_individuals = [1, 2, 4, 8]
-        default_mutation_chances = [0.05, 0.10]
-        mutation_chance_feedbacks = [False, True]
         mutation_chance_self_adaptivities = [False, True]
 
         combination_average_deltas = []
 
+        island_no_swapped_individuals = [1, 2, 4, 8]
+        default_mutation_chances = [0.05, 0.10]
+        mutation_chance_feedbacks = [False, True]
         output_file.write('-' * 50 + '\n')
         logger.info('-' * 50)
 
@@ -96,7 +96,10 @@ if __name__ == '__main__':
 
             combination_choice_key = np.random.choice(list(combinations.keys()), 1)[0]
             chosen_combination = combinations[combination_choice_key]
-            current_combination_original = chosen_combination[0:6] + (int(chosen_combination[0].total_population_size / (4 * chosen_combination[3])), int(chosen_combination[0].total_population_size / chosen_combination[3]), int(chosen_combination[0].total_population_size / chosen_combination[3])) + chosen_combination[6:] + (0.001, 3, False)
+            current_combination_original = chosen_combination[0:6] + (int(chosen_combination[0].total_population_size / (4 * chosen_combination[3])), int(chosen_combination[0].total_population_size / chosen_combination[3]), int(chosen_combination[0].total_population_size / chosen_combination[3])) + chosen_combination[6:] + (0.001, 3)
+
+            print(chosen_combination)
+            print(f"{chosen_combination[0].total_population_size} / (4 * {chosen_combination[3]}))")          
             del combinations[combination_choice_key]
         
             # Set up the comparison

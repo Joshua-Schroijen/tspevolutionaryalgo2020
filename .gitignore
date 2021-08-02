@@ -1,4 +1,5 @@
 __pycache__/
+results/
 r0486848.csv
 r0486848_means.png
 r0486848_bests.png
@@ -15,3 +16,10 @@ optimize_hyperparameters_200.log
 optimize_hyperparameters_500.log
 optimize_hyperparameters_1000.log
 compare_parameters.log
+r0486848_hyperparameter_optimization_results.txt
+r0486848_hyperparameter_optimization_results_50.txt
+r0486848_hyperparameter_optimization_results_100.txt
+r0486848_hyperparameter_optimization_results_150.txt
+r0486848_hyperparameter_optimization_results_200.txt
+r0486848_hyperparameter_optimization_results_500.txt
+r0486848_hyperparameter_optimization_results_1000.txt

@@ -82,7 +82,7 @@ class PopulationGenerationSettings:
     
     @property
     def total_population_size(self):
-        return self._no_random_individuals + self._no_base_nearest_neighbour_individuals + self._no_derived_nearest_neighbour_individuals
+        return self._no_random_individuals + (self._no_base_nearest_neighbour_individuals * self._no_derived_nearest_neighbour_individuals)
 
     def __repr__(self):
         return f"PopulationGenerationSettings(no_random_indvs = {self._no_random_individuals}, no_base_nn_indvs = {self._no_base_nearest_neighbour_individuals}, no_derived_nn_indvs = {self._no_derived_nearest_neighbour_individuals})"
@@ -115,7 +115,7 @@ class r0486848:
 
         self._parameters_set = False
         
-    def set_parameters(self, population_generation_settings, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances, provide_analytics):
+    def set_parameters(self, population_generation_settings, recombination_operator, elimination_scheme, no_islands, island_swap_rate, island_no_swapped_individuals, default_k, mu, no_individuals_to_keep, default_mutation_chance, mutation_chance_feedback, mutation_chance_self_adaptivity, stopping_ratio, tolerances):
         """
         Sets the evolutionary algorithm's parameters
         
@@ -149,15 +149,16 @@ class r0486848:
         self._stopping_ratio = stopping_ratio
         self._tolerances = tolerances
     
+        self._parameters_set = True
+
+    def optimize(self, source, provide_graphs=False, provide_analytics=False, verbose=False):
+        self._provide_graphs = provide_graphs
         self._provide_analytics = provide_analytics
         if self._provide_analytics == True:
             self.optimize = profile("algorithm_profile.txt")(self._optimize)
         else:
             self.optimize = self._optimize
 
-        self._parameters_set = True
-
-    def optimize(self, source, verbose=False):   
         if verbose == True:
             logger.info("Starting evolutionary algorithm ...")
         # Start timer for assessing optimization speed
@@ -175,8 +176,23 @@ class r0486848:
             self._tsp = TSP(distanceMatrix)
         
         if self._parameters_set == False:
-            self.set_parameters(population_generation_settings = PopulationGenerationSettings(0, self._tsp.no_vertices, 3), recombination_operator = RecombinationOperator.HGREX, elimination_scheme = EliminationScheme.LAMBDAPLUSMU, no_islands = 7, island_swap_rate = 3, island_no_swapped_individuals = 8, default_k = int((self._tsp.no_vertices * 3) / (7 * 4)), mu = int((self._tsp.no_vertices * 3) / 7), no_individuals_to_keep = int((self._tsp.no_vertices * 3) / 7), default_mutation_chance = 0.1, mutation_chance_feedback = False, mutation_chance_self_adaptivity = False, stopping_ratio = 0.001, tolerances = 3, provide_analytics = False)
-        
+            population_generation_settings = PopulationGenerationSettings(round(self._tsp.no_vertices / 3), round((2 * self._tsp.no_vertices ) / 3), 6)
+            recombination_operator = RecombinationOperator.HGREX
+            elimination_scheme = EliminationScheme.LAMBDAPLUSMU
+            island_swap_rate = 6
+            island_no_swapped_individuals = 32
+            if self._tsp.no_vertices > 200:
+                population_generation_settings = PopulationGenerationSettings(math.floor(self._tsp.no_vertices / 30), 0, 0)
+                recombination_operator = RecombinationOperator.PMX
+                elimination_scheme = EliminationScheme.LAMBDA_MU
+
+            total_population_size = population_generation_settings.total_population_size
+            no_islands = max(2, int(total_population_size / 7))
+            default_k = max(2, int((total_population_size) / (no_islands * 4)))
+            mu = int((total_population_size) / no_islands)
+            no_individuals_to_keep = int((total_population_size) / no_islands)
+            self.set_parameters(population_generation_settings = population_generation_settings, recombination_operator = recombination_operator, elimination_scheme = elimination_scheme, no_islands = no_islands, island_swap_rate = island_swap_rate, island_no_swapped_individuals = island_no_swapped_individuals, default_k = default_k, mu = mu, no_individuals_to_keep = no_individuals_to_keep, default_mutation_chance = 0.05, mutation_chance_feedback = False, mutation_chance_self_adaptivity = False, stopping_ratio = 0.001, tolerances = 3)
+
         # Report TSP instance heuristic benchmark performance
         nn_mean_fitness, nn_best_fitness = self._get_benchmarks()
         if verbose == True:
@@ -196,7 +212,7 @@ class r0486848:
         best_fitnesses = [current_best_fitness]
         
         self.reporter.report(current_mean_fitness, current_best_fitness, self._tsp.best_individual(complete_initial_population.individuals).permutation)
-        if self._provide_analytics == True: mean_distances_to_others = [complete_initial_population.get_mean_distance_to_others()]
+        if self._provide_graphs == True: mean_distances_to_others = [complete_initial_population.get_mean_distance_to_others()]
 
         initial_subpopulations = complete_initial_population.get_subpopulations(self._no_islands, False)
         evolutionary_algorithms = [self.__get_EA(subpopulation) for subpopulation in initial_subpopulations]
@@ -219,7 +235,7 @@ class r0486848:
                 mean_fitnesses.append(current_mean_fitness)
                 best_fitnesses.append(current_best_fitness)
                 
-                if self._provide_analytics == True: mean_distances_to_others.append(current_population.get_mean_distance_to_others())
+                if self._provide_graphs == True: mean_distances_to_others.append(current_population.get_mean_distance_to_others())
                
                 # Call the reporter with:
                 #  - the mean objective function value of the population
@@ -253,7 +269,7 @@ class r0486848:
         if verbose == True:
             logger.info(report)
         
-        if self._provide_analytics == True:
+        if self._provide_graphs == True:
             ticks_step = ((iteration_number + 1) // 10) + 1
             
             # Generate plots of the mean and best fitnesses as the iterations progress and save them to r0486848_means.png and r0486848_bests.png respectively
@@ -269,7 +285,7 @@ class r0486848:
             upper_y_bound = max(itertools.chain(mean_fitnesses, [nn_mean_fitness])) * 1.2
             plt.ylim([lower_y_bound, upper_y_bound])
             plt.xticks(range(0, len(iteration_numbers), ticks_step))
-            plt.savefig('r0486848_means.png')
+            plt.savefig(f"r0486848_means_{self._tsp.no_vertices}.png")
             plt.figure()
             plt.plot(iteration_numbers, best_fitnesses, label="Best fitness")
             plt.hlines(nn_best_fitness, 0, len(iteration_numbers) - 1, label="Best heuristic fitness", colors="r")
@@ -282,7 +298,7 @@ class r0486848:
             upper_y_bound = max(itertools.chain(best_fitnesses, [nn_best_fitness])) * 1.2
             plt.ylim([lower_y_bound, upper_y_bound])
             plt.xticks(range(0, len(iteration_numbers), ticks_step))
-            plt.savefig('r0486848_bests.png')
+            plt.savefig(f"r0486848_bests_{self._tsp.no_vertices}.png")
 
             # Plot the evolution of the mean distance from individuals to eachother in the population
             plt.figure()
@@ -294,7 +310,7 @@ class r0486848:
             plt.xlim([0, len(iteration_numbers) - 1])
             plt.ylim([0, self._tsp.no_vertices - 1])
             plt.xticks(range(0, len(iteration_numbers), ticks_step))
-            plt.savefig('r0486848_mean_distance_from_individuals_to_eachother.png')
+            plt.savefig(f"r0486848_mean_distance_from_individuals_to_eachother_{self._tsp.no_vertices}.png")
         
             # Plot the final population distribution and save it to r0486848_last_distribution.png
             plt.figure()
@@ -302,8 +318,9 @@ class r0486848:
             plt.title('Distribution of individuals')
             plt.xlabel('Distance to identity permutation')
             plt.ylabel('# individuals')
-            plt.savefig('r0486848_last_distribution.png')
+            plt.savefig(f"r0486848_last_distribution_{self._tsp.no_vertices}.png")
 
+        if self._provide_analytics == True:
             # Write the last population's contents to r0486848_last_population.txt        
             current_population.write_to_file("r0486848_last_population.txt")
 
@@ -556,7 +573,6 @@ class EvolutionaryAlgorithm:
 
         :return: a random, best-out-of-k Individual object
         """
-        
         # Select k random individuals from the population
         selected = list(np.random.choice(self._population.individuals, self.k))
         # Map them to their fitness with a list comprehension
